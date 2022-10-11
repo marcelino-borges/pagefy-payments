@@ -1,0 +1,138 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "0.1.0",
+    "title": "REST API",
+    "description": ""
+  },
+  "host": "http://socialbio-payments.onrender.com",
+  "basePath": "/",
+  "schemes": [
+    "http"
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "paths": {
+    "/subscription": {
+      "post": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Creates a new subscription for a given user",
+        "description": "Creates a new subscription for a given user",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "currency",
+            "in": "body",
+            "description": "User currency",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          },
+          {
+            "name": "recurrency",
+            "in": "body",
+            "description": "month or year",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Subscription created"
+          },
+          "400": {
+            "description": "Message of error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Message of error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "example": "asd123asd-asd12asd"
+        },
+        "authId": {
+          "type": "string",
+          "example": "123d1d1c1c1c"
+        },
+        "paymentId": {
+          "type": "string",
+          "example": "s90df090d9s08s7g7809s"
+        },
+        "firstName": {
+          "type": "string",
+          "example": "John"
+        },
+        "lastName": {
+          "type": "string",
+          "example": "Doe"
+        },
+        "email": {
+          "type": "string",
+          "example": "example@email.com"
+        },
+        "profileImageUrl": {
+          "type": "string",
+          "example": "https://www.url.com"
+        },
+        "agreePrivacy": {
+          "type": "boolean",
+          "example": true
+        },
+        "receiveCommunications": {
+          "type": "boolean",
+          "example": true
+        },
+        "plan": {
+          "type": "number",
+          "example": 0
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "properties": {
+        "statusCode": {
+          "type": "number",
+          "example": 200
+        },
+        "errorDetails": {
+          "type": "string",
+          "example": "Details of the error (if any)"
+        },
+        "message": {
+          "type": "string",
+          "example": "Summary of the result"
+        }
+      }
+    }
+  }
+}
