@@ -1,6 +1,9 @@
 import UserDB from "../models/user.models";
 import { IUser } from "./../models/user.models";
 
+// TODO:
+// Substituir services por chamadas a outra API
+
 export const getUserByEmail = async (email: string) => {
   const found = await UserDB.findOne({ email }).lean();
 
@@ -29,16 +32,6 @@ export const getUserByAuthId = async (authId: string) => {
   }
 
   return found;
-};
-
-export const createUser = async (user: IUser) => {
-  const userCreated = (await UserDB.create(user)).toObject();
-
-  if (!userCreated) {
-    return null;
-  }
-
-  return userCreated;
 };
 
 export const updateUser = async (user: IUser) => {
