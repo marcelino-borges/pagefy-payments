@@ -3,10 +3,12 @@ import cors from "cors";
 import express from "express";
 import routes from "./routes";
 import dotenvSafe from "dotenv-safe";
+import admin from "firebase-admin";
 import swaggerFile from "../swagger_output.json";
 import swaggerUi from "swagger-ui-express";
 import connectMongo from "./config/mongo";
 import { initializeStripe } from "./config/stripe";
+import firebaseConfig from "./config/firebase";
 import log from "./utils/logs";
 
 dotenvSafe.config({
@@ -19,6 +21,12 @@ const canReadEnv = String(process.env.MONGO_CONNECTION_STRING).includes(
 
 if (canReadEnv) {
   log.success(".ENV verified!");
+
+  admin.initializeApp({
+    credential: admin.credential.cert(JSON.parse(firebaseConfig)),
+    storageBucket: JSON.parse(firebaseConfig).storageBucket,
+  });
+
   const PORT = parseInt(process.env.PORT as string, 10);
 
   console.log("PORT on env: ", PORT);
