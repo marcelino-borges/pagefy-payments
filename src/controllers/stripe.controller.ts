@@ -149,7 +149,7 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
       required: true,
       type: 'string'
     }
-    #swagger.responses[201] = {
+    #swagger.responses[200] = {
       description: 'Subscription created'
     }
     #swagger.responses[400] = {
@@ -184,6 +184,66 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
     return res.status(200).json(subscriptionCanceled);
   } catch (e: any) {
     log.error("[StripeController.cancelSubsctription] EXCEPTION: ", e);
+    return res
+      .status(500)
+      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
+  }
+};
+
+export const getSubsctriptionPaymentIntent = async (
+  req: Request,
+  res: Response
+) => {
+  /* 
+    #swagger.tags = ['Subscription']
+    #swagger.summary = 'Gets a payment intent from a subscription'
+    #swagger.description  = 'Gets a payment intent from a subscription'
+
+    #swagger.parameters['paymentIntentId'] = {
+      in: 'query',
+      description: 'Payment Intent ID',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      description: 'Subscription created'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+  const { paymentIntentId } = req.params;
+
+  if (!paymentIntentId) {
+    return res
+      .status(400)
+      .json(new AppResult(AppErrorsMessages.MISSING_PROPS, null, 400));
+  }
+
+  try {
+    const paymentIntent: any = await stripeService.cancelSubscriptionOnStripe(
+      paymentIntentId
+    );
+
+    if (!paymentIntent) {
+      return res
+        .status(400)
+        .json(
+          new AppResult(AppErrorsMessages.PAYMENT_INTENT_NOT_FOUND, null, 400)
+        );
+    }
+
+    return res.status(200).json(paymentIntent);
+  } catch (e: any) {
+    log.error(
+      "[StripeController.getSubsctriptionPaymentIntent] EXCEPTION: ",
+      e
+    );
     return res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));

@@ -57,6 +57,25 @@ export const assureStripeCustomerCreated = async (
   };
 };
 
+export const getSubsctriptionPaymentIntent = async (
+  paymentIntentId: string
+) => {
+  if (!stripeInstance) stripeInstance = await initializeStripe();
+
+  if (!stripeInstance) return null;
+
+  if (!paymentIntentId) {
+    return null;
+  }
+
+  const paymentIntent = stripeInstance.paymentIntents.retrieve(paymentIntentId);
+
+  if (!paymentIntent) {
+    return null;
+  }
+  return paymentIntent;
+};
+
 export const createSubscriptionOnStripe = async (
   paymentId: string,
   currency: string,

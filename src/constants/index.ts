@@ -10,4 +10,5 @@ export enum AppErrorsMessages {
   PAYMENT_CUSTOMER_NOT_CREATED = "Payment customer not created.",
   SUBSCRIPTION_NOT_CREATED = "Subscription not created.",
   SUBSCRIPTION_NOT_CANCELED = "Subscription not canceled.",
+  PAYMENT_INTENT_NOT_FOUND = "Payment intent not found.",
 }

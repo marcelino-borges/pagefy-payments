@@ -15,5 +15,10 @@ router.put(
   verifyToken,
   stripeController.cancelSubsctription
 );
+router.get(
+  "/subscription/paymentintent/:paymentIntentId",
+  verifyToken,
+  stripeController.getSubsctriptionPaymentIntent
+);
 
 export default router;

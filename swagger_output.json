@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "0.2.0",
+    "version": "0.3.0",
     "title": "REST API",
     "description": ""
   },
@@ -98,7 +98,56 @@
           }
         ],
         "responses": {
-          "201": {
+          "200": {
+            "description": "Subscription created"
+          },
+          "400": {
+            "description": "Message of error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Message of error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/subscription/paymentintent/{paymentIntentId}": {
+      "get": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Gets a payment intent from a subscription",
+        "description": "Gets a payment intent from a subscription",
+        "parameters": [
+          {
+            "name": "paymentIntentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "paymentIntentId",
+            "in": "query",
+            "required": true,
+            "type": "string",
+            "description": "Payment Intent ID"
+          }
+        ],
+        "responses": {
+          "200": {
             "description": "Subscription created"
           },
           "400": {

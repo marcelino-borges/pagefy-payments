@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.3.0] - 2022-10-13
+
+- Feature: Endpoint to get payment intent
+
 ### [0.2.0] - 2022-10-13
 
 - Feature: Endpoint to cancel subscription
