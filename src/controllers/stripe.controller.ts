@@ -181,7 +181,7 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
         );
     }
 
-    return res.status(201).json(subscriptionCanceled);
+    return res.status(200).json(subscriptionCanceled);
   } catch (e: any) {
     log.error("[StripeController.cancelSubsctription] EXCEPTION: ", e);
     return res
