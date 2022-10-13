@@ -4,6 +4,7 @@ import { AppErrorsMessages } from "../constants";
 import { IUser, PlansTypes } from "../models/user.models";
 import SubscriptionsDB, {
   ISubscriptionCreationResult,
+  SubscriptionStatus,
 } from "../models/subscription.models";
 import log from "../utils/logs";
 
@@ -64,7 +65,7 @@ export const createSubscriptionOnStripe = async (
 ) => {
   if (!stripeInstance) stripeInstance = await initializeStripe();
 
-  if (!stripeInstance) return;
+  if (!stripeInstance) return null;
 
   if (!paymentId) {
     return null;
@@ -95,6 +96,36 @@ export const createSubscriptionOnStripe = async (
     return null;
   }
   return subscription;
+};
+
+export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
+  if (!stripeInstance) stripeInstance = await initializeStripe();
+
+  if (!stripeInstance) return null;
+
+  const subscriptionUpdated = await SubscriptionsDB.findOneAndUpdate(
+    {
+      subscriptionId,
+    },
+    {
+      status: SubscriptionStatus.canceled,
+    },
+    {
+      new: true,
+    }
+  );
+
+  if (!subscriptionUpdated) {
+    return null;
+  }
+
+  const subscription = stripeInstance.subscriptions.del(subscriptionId);
+
+  if (!subscription) {
+    return null;
+  }
+
+  return subscriptionUpdated;
 };
 
 export const saveSubscriptionResult = async (

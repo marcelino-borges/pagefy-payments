@@ -10,5 +10,10 @@ const router = express.Router();
 
 // Private routes
 router.post("/subscription", verifyToken, stripeController.createSubsctription);
+router.put(
+  "/subscription/cancel/:subscriptionId",
+  verifyToken,
+  stripeController.cancelSubsctription
+);
 
 export default router;

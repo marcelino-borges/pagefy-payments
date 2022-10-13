@@ -136,3 +136,56 @@ export const createSubsctription = async (req: Request, res: Response) => {
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
   }
 };
+
+export const cancelSubsctription = async (req: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Subscription']
+    #swagger.summary = 'Cancels a subscription'
+    #swagger.description  = 'Cancels a subscription'
+
+    #swagger.parameters['subscriptionId'] = {
+      in: 'params',
+      description: 'Subscription ID',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[201] = {
+      description: 'Subscription created'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+  const { subscriptionId } = req.params;
+
+  if (!subscriptionId) {
+    return res
+      .status(400)
+      .json(new AppResult(AppErrorsMessages.MISSING_PROPS, null, 400));
+  }
+
+  try {
+    const subscriptionCanceled: ISubscriptionCreationResult | null =
+      await stripeService.cancelSubscriptionOnStripe(subscriptionId);
+
+    if (!subscriptionCanceled) {
+      return res
+        .status(400)
+        .json(
+          new AppResult(AppErrorsMessages.SUBSCRIPTION_NOT_CANCELED, null, 400)
+        );
+    }
+
+    return res.status(201).json(subscriptionCanceled);
+  } catch (e: any) {
+    log.error("[StripeController.cancelSubsctription] EXCEPTION: ", e);
+    return res
+      .status(500)
+      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
+  }
+};

@@ -22,6 +22,18 @@ export interface ISubscriptionCreationResult {
   status: string;
 }
 
+export enum SubscriptionStatus {
+  active = "active",
+  past_due = "past_due",
+  unpaid = "unpaid",
+  canceled = "canceled",
+  incomplete = "incomplete",
+  incomplete_expired = "incomplete_expired",
+  trialing = "trialing",
+  all = "all",
+  ended = "ended",
+}
+
 const subscriptionSchema = new Schema<ISubscriptionCreationResult>(
   {
     subscriptionId: { type: String },

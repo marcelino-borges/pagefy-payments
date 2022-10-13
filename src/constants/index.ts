@@ -9,4 +9,5 @@ export enum AppErrorsMessages {
   INVALID_PAYMENT_INSTANCE = "Invalid Payment instance.",
   PAYMENT_CUSTOMER_NOT_CREATED = "Payment customer not created.",
   SUBSCRIPTION_NOT_CREATED = "Subscription not created.",
+  SUBSCRIPTION_NOT_CANCELED = "Subscription not canceled.",
 }
