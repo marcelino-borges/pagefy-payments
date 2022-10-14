@@ -185,6 +185,7 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
   }
 
   let event;
+  log.warn(`req.body\n${req.body}`);
 
   try {
     event = stripeInstance.webhooks.constructEvent(
@@ -192,10 +193,11 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
       req.headers["stripe-signature"] as any,
       webhookSecret
     );
-    res.send();
   } catch (error: any) {
     log.error(`Webhook Error ${error.message}`);
-    return res.status(400).send(`Webhook Error: ${error.message}`);
+    return res
+      .status(500)
+      .json(new AppResult(`Webhook Error`, error.message, 500));
   }
   if (!event) return null;
 
@@ -246,7 +248,11 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
           <br>
           Sorry, your payment failed!<br>
           Please try to subscribe again.<br>
-          <a href"https://socialbio.me">Click here to try again.</a>          
+          <a href"https://socialbio.me">Click here to try again.</a>        
+          <br>
+          <br>
+          Socialbio Team<br>  
+
           `,
       };
       break;
@@ -264,7 +270,11 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
         You are now a ${getPlanByPriceId(
           updatedSubscription.priceId
         )} subscriber!<br>
-        Welcome onboard!
+        Welcome onboard!<br>
+        <br>
+        <br>
+        Socialbio Team<br>
+        <a href"https://socialbio.me">https://www.socialbio.me</a>   
         `,
       };
       break;
@@ -276,6 +286,8 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
   if (!userRecipient) return null;
 
   sendEmailToUser(userRecipient);
+
+  res.status(200);
 };
 
 const getPriceIdByRecurrencyAndPlanType = (

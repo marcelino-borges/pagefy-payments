@@ -280,6 +280,7 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
     }
   */
   try {
+    log.warn(`111111111111111`);
     stripeService.hookPaymentFromStripe(req, res);
   } catch (e: any) {
     log.error(

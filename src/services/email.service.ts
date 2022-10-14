@@ -35,6 +35,6 @@ export const sendEmailToUser = async (userRecipient: IEmailRecipient) => {
     })
     .catch(() => {
       log.error(`Error sending email to user ${email}`);
-      return false;
+      return null;
     });
 };

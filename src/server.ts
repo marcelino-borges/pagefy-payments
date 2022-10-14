@@ -60,7 +60,7 @@ if (canReadEnv) {
       );
       app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
       app.use("/api/v1/webhooks", routesWebhooks);
-      app.use("/api/v1", routesClient);
+      app.use("/api/v1/client", routesClient);
 
       const server = app.listen(PORT, () => {
         console.log(`Listening on port ${PORT}`);
