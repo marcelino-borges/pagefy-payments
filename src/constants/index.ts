@@ -12,3 +12,10 @@ export enum AppErrorsMessages {
   SUBSCRIPTION_NOT_CANCELED = "Subscription not canceled.",
   PAYMENT_INTENT_NOT_FOUND = "Payment intent not found.",
 }
+
+export const SYSTEM_EMAIL_CREDENTIALS = {
+  user: process.env.SYSTEM_EMAIL,
+  password: process.env.SYSTEM_EMAIL_PASSWORD,
+};
+
+export const NOREPLY_EMAIL = process.env.NOREPLY_EMAIL;

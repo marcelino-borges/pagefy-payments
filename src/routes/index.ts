@@ -21,4 +21,14 @@ router.get(
   stripeController.getSubsctriptionPaymentIntent
 );
 
+/*
+ * Webhooks Stripe
+ */
+
+router.post(
+  "/webhooks/stripe",
+  express.raw({ type: "application/json" }),
+  stripeController.hookPaymentFromStripe
+);
+
 export default router;

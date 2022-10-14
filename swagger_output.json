@@ -167,6 +167,47 @@
           }
         }
       }
+    },
+    "/webhooks/stripe/payment": {
+      "post": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Gets a payment intent from Stripe",
+        "description": "Gets a payment intent from Stripe",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "stripe-signature",
+            "in": "header",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Subscription created"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Message of error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {

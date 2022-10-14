@@ -8,6 +8,9 @@ export const initializeStripe = async () => {
   try {
     if (process.env.STRIPE_SECRET_KEY) {
       stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
+        appInfo: {
+          name: "Socialbio",
+        },
         apiVersion: "2022-08-01",
         typescript: true,
       });

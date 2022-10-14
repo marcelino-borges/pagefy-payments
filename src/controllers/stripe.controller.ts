@@ -105,8 +105,10 @@ export const createSubsctription = async (req: Request, res: Response) => {
 
     const subscriptionResult: ISubscriptionCreationResult = {
       subscriptionId: subscription.id,
-      subscriptionEnd: subscription.current_period_end,
-      subscriptionStart: subscription.current_period_start,
+      subscriptionEnd: new Date(subscription.current_period_end).toISOString(),
+      subscriptionStart: new Date(
+        subscription.current_period_start
+      ).toISOString(),
       currency: subscription.items.data[0].price.currency,
       priceId: subscription.items.data[0].price.id,
       recurrency: subscription.items.data[0].price.recurring?.interval,
@@ -115,6 +117,9 @@ export const createSubsctription = async (req: Request, res: Response) => {
       userId: userWithPaymentId._id,
       status: subscription.status,
     };
+
+    if (subscriptionResult.latestInvoice?.client_secret)
+      subscriptionResult.latestInvoice.client_secret = null;
 
     const subscriptionSaved = await stripeService.saveSubscriptionResult(
       subscriptionResult
@@ -239,6 +244,47 @@ export const getSubsctriptionPaymentIntent = async (
     }
 
     return res.status(200).json(paymentIntent);
+  } catch (e: any) {
+    log.error(
+      "[StripeController.getSubsctriptionPaymentIntent] EXCEPTION: ",
+      e
+    );
+    return res
+      .status(500)
+      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
+  }
+};
+
+export const hookPaymentFromStripe = async (req: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Subscription']
+    #swagger.summary = 'Gets a payment intent from Stripe'
+    #swagger.description  = 'Gets a payment intent from Stripe'
+
+    #swagger.parameters['paymentIntent'] = {
+      in: 'body',
+      description: 'Payment Intent',
+      required: true,
+      type: object
+    }
+    #swagger.responses[200] = {
+      description: 'Subscription created'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+  const signature = req.headers["stripe-signature"];
+
+  console.log("-------", JSON.stringify(signature));
+
+  try {
+    stripeService.hookPaymentFromStripe(req, res);
   } catch (e: any) {
     log.error(
       "[StripeController.getSubsctriptionPaymentIntent] EXCEPTION: ",

@@ -1,14 +1,20 @@
 import Stripe from "stripe";
-import { initializeStripe } from "../config/stripe";
+import stripe, { initializeStripe } from "../config/stripe";
 import { AppErrorsMessages } from "../constants";
-import { IUser, PlansTypes } from "../models/user.models";
+import AppResult from "../errors/app-error";
+import UserDb, { IUser, PlansTypes } from "../models/user.models";
+import { Request, Response } from "express";
 import SubscriptionsDB, {
+  IPaymentIntent,
   ISubscriptionCreationResult,
   SubscriptionStatus,
 } from "../models/subscription.models";
-import log from "../utils/logs";
+import { getDictionayByLanguage } from "../utils/localization";
+import { IEmailRecipient } from "../models/email.models";
+import { sendEmailToUser } from "./email.service";
+import log from "./../utils/logs";
 
-let stripeInstance: Stripe | null = null;
+let stripeInstance: Stripe | null = stripe;
 
 export const createCustomer = async (
   user: IUser
@@ -169,6 +175,111 @@ export const updateSubscriptionResult = async (
   )?.toObject();
 };
 
+export const hookPaymentFromStripe = async (req: Request, res: Response) => {
+  if (!stripeInstance) stripeInstance = await initializeStripe();
+  if (!stripeInstance) return null;
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    throw new Error(AppErrorsMessages.INTERNAL_ERROR);
+  }
+
+  let event;
+
+  try {
+    log.info("req.body", JSON.stringify(req.body));
+    log.info("req.headers", JSON.stringify(req.headers));
+    event = stripeInstance.webhooks.constructEvent(
+      req.body,
+      req.headers["stripe-signature"] as any,
+      webhookSecret
+    );
+    console.log("2");
+    return res.send();
+  } catch (error: any) {
+    log.error(`Webhook Error ${error.message}`);
+    res.status(400).send(`Webhook Error: ${error.message}`);
+  }
+  if (!event) return null;
+
+  log.warn("PASSOU!!!");
+  const paymentIntent: IPaymentIntent = event.data.object as IPaymentIntent;
+
+  const updatedSubscription = await SubscriptionsDB.findOneAndUpdate(
+    {
+      latestInvoice: {
+        payment_intent: {
+          id: paymentIntent.id,
+        },
+      },
+    },
+    {
+      latestInvoice: {
+        payment_intent: paymentIntent,
+      },
+      status: paymentIntent.status,
+    },
+    {
+      new: true,
+    }
+  );
+
+  if (!updatedSubscription) return null;
+
+  const userFound = await UserDb.findOne({
+    _id: updatedSubscription.userId,
+  }).lean();
+
+  if (!userFound) return null;
+
+  const dictionary = getDictionayByLanguage("en");
+  let userRecipient: IEmailRecipient | undefined = undefined;
+
+  // Handle the event
+  switch (event.type) {
+    case "payment_intent.payment_failed":
+      userRecipient = {
+        name: userFound.firstName,
+        email: userFound.email,
+        subject: `[Socialbio] ${dictionary.payment}`,
+        language: "en",
+        message: `
+          <b>Hey ${userFound.firstName},</b><br>
+          <br>
+          Sorry, your payment failed!<br>
+          Please try to subscribe again.<br>
+          <a href"https://socialbio.me">Click here to try again.</a>          
+          `,
+      };
+      break;
+    case "payment_intent.succeeded":
+      userRecipient = {
+        name: userFound.firstName,
+        email: userFound.email,
+        subject: `[Socialbio] ${dictionary.payment}`,
+        language: "en",
+        message: `
+        <b>Hey ${userFound.firstName},</b><br>
+        <br>
+        Congratulations! Your payment was finished with success!<br>
+        You are now a ${getPlanByPriceId(
+          updatedSubscription.priceId
+        )} subscriber!<br>
+        Welcome onboard!
+        `,
+      };
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+      break;
+  }
+
+  if (!userRecipient) return null;
+
+  sendEmailToUser(userRecipient);
+};
+
 const getPriceIdByRecurrencyAndPlanType = (
   recurrency: "month" | "year",
   planType: PlansTypes
@@ -187,4 +298,18 @@ const getPriceIdByRecurrencyAndPlanType = (
     }
   }
   return undefined;
+};
+
+const getPlanByPriceId = (priceId: string) => {
+  if (
+    priceId === process.env.STRIPE_PRICE_VIP_MONTH_ID ||
+    priceId === process.env.STRIPE_PRICE_VIP_YEAR_ID
+  )
+    return PlansTypes.VIP;
+  else if (
+    priceId === process.env.STRIPE_PRICE_PLATINUM_MONTH_ID ||
+    priceId === process.env.STRIPE_PRICE_PLATINUM_YEAR_ID
+  )
+    return PlansTypes.PLATINUM;
+  else return PlansTypes.FREE;
 };
