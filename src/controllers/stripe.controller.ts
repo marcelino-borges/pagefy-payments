@@ -17,7 +17,6 @@ export const createSubsctription = async (req: Request, res: Response) => {
     #swagger.tags = ['Subscription']
     #swagger.summary = 'Creates a new subscription for a given user'
     #swagger.description  = 'Creates a new subscription for a given user'
-
     #swagger.parameters['currency'] = {
       in: 'body',
       description: 'User currency',
@@ -147,7 +146,6 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
     #swagger.tags = ['Subscription']
     #swagger.summary = 'Cancels a subscription'
     #swagger.description  = 'Cancels a subscription'
-
     #swagger.parameters['subscriptionId'] = {
       in: 'params',
       description: 'Subscription ID',
@@ -203,7 +201,6 @@ export const getSubsctriptionPaymentIntent = async (
     #swagger.tags = ['Subscription']
     #swagger.summary = 'Gets a payment intent from a subscription'
     #swagger.description  = 'Gets a payment intent from a subscription'
-
     #swagger.parameters['paymentIntentId'] = {
       in: 'query',
       description: 'Payment Intent ID',
@@ -257,11 +254,10 @@ export const getSubsctriptionPaymentIntent = async (
 
 export const hookPaymentFromStripe = async (req: Request, res: Response) => {
   /* 
-    #swagger.tags = ['Subscription']
-    #swagger.summary = 'Gets a payment intent from Stripe'
-    #swagger.description  = 'Gets a payment intent from Stripe'
-
-    #swagger.parameters['paymentIntent'] = {
+    #swagger.tags = ['Webhooks']
+    #swagger.summary = 'Receives webhook events from Stripe'
+    #swagger.description  = 'Receives webhook events from Stripe'
+    #swagger.parameters['event'] = {
       in: 'body',
       description: 'Payment Intent',
       required: true,
@@ -280,7 +276,6 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
     }
   */
   try {
-    log.warn(`111111111111111`);
     stripeService.hookPaymentFromStripe(req, res);
   } catch (e: any) {
     log.error(

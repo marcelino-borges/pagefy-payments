@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import stripe, { initializeStripe } from "../config/stripe";
-import { AppErrorsMessages } from "../constants";
+import { AppErrorsMessages, SYSTEM_EMAIL_CREDENTIALS } from "../constants";
 import AppResult from "../errors/app-error";
 import UserDb, { IUser, PlansTypes } from "../models/user.models";
 import { Request, Response } from "express";
@@ -13,6 +13,11 @@ import { getDictionayByLanguage } from "../utils/localization";
 import { IEmailRecipient } from "../models/email.models";
 import { sendEmailToUser } from "./email.service";
 import log from "./../utils/logs";
+import {
+  convertPaymentAmountToDecimalString,
+  getPlanByPriceId,
+  getPriceIdByRecurrencyAndPlanType,
+} from "../utils/stripe";
 
 let stripeInstance: Stripe | null = stripe;
 
@@ -177,7 +182,11 @@ export const updateSubscriptionResult = async (
 
 export const hookPaymentFromStripe = async (req: Request, res: Response) => {
   if (!stripeInstance) stripeInstance = await initializeStripe();
-  if (!stripeInstance) return null;
+  if (!stripeInstance)
+    return res
+      .status(500)
+      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, undefined, 500));
+
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   if (!webhookSecret) {
@@ -185,7 +194,6 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
   }
 
   let event;
-  log.warn(`req.body\n${req.body}`);
 
   try {
     event = stripeInstance.webhooks.constructEvent(
@@ -199,7 +207,10 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
       .status(500)
       .json(new AppResult(`Webhook Error`, error.message, 500));
   }
-  if (!event) return null;
+  if (!event)
+    return res
+      .status(500)
+      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, undefined, 500));
 
   const paymentIntent: IPaymentIntent = event.data.object as IPaymentIntent;
 
@@ -222,104 +233,95 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
     }
   );
 
-  if (!updatedSubscription) return null;
+  log.warn(`111111111111111`);
+  if (updatedSubscription) {
+    log.warn(`22222222222`);
+    const userFound = await UserDb.findOne({
+      _id: updatedSubscription.userId,
+    }).lean();
 
-  const userFound = await UserDb.findOne({
-    _id: updatedSubscription.userId,
-  }).lean();
+    if (userFound) {
+      log.warn(`33333`);
+      const dictionary = getDictionayByLanguage("en");
+      let userRecipient: IEmailRecipient | undefined = undefined;
+      log.warn("event.type: " + event.type);
 
-  if (!userFound) return null;
+      // Handle the event
+      switch (event.type) {
+        case "payment_intent.payment_failed":
+          log.warn("Pagamento falhou, do usuario " + userFound.email);
+          userRecipient = {
+            name: userFound.firstName,
+            email: userFound.email,
+            subject: `[Socialbio] ${dictionary.payment}`,
+            language: "en",
+            message: `
+            <b>Hey ${userFound.firstName},</b><br>
+            <br>
+            Sorry, your payment failed!<br>
+            Please try to subscribe again.<br>
+            <a href"https://socialbio.me">Click here to try again.</a>        
+            <br>
+            <br>
+            Socialbio Team<br>  
 
-  const dictionary = getDictionayByLanguage("en");
-  let userRecipient: IEmailRecipient | undefined = undefined;
-  log.warn("event.type: " + event.type);
+            `,
+          };
 
-  // Handle the event
-  switch (event.type) {
-    case "payment_intent.payment_failed":
-      log.warn("Pagamento falhou, do usuario " + userFound.email);
-      userRecipient = {
-        name: userFound.firstName,
-        email: userFound.email,
-        subject: `[Socialbio] ${dictionary.payment}`,
-        language: "en",
-        message: `
-          <b>Hey ${userFound.firstName},</b><br>
-          <br>
-          Sorry, your payment failed!<br>
-          Please try to subscribe again.<br>
-          <a href"https://socialbio.me">Click here to try again.</a>        
-          <br>
-          <br>
-          Socialbio Team<br>  
+          if (SYSTEM_EMAIL_CREDENTIALS?.user) {
+            const plan = getPlanByPriceId(updatedSubscription.priceId);
+            const amount: string = convertPaymentAmountToDecimalString(
+              paymentIntent.amount
+            );
+            const currency = paymentIntent.currency;
+            const systemRecipient: IEmailRecipient = {
+              name: "System",
+              email: SYSTEM_EMAIL_CREDENTIALS.user,
+              subject: `[Socialbio] ${dictionary.payment}`,
+              language: "en",
+              message: `
+              <b>Hey Team!</b><br>
+              <br>
+              User ${userFound.firstName} (${
+                userFound.email
+              }) has just paid for a ${plan} subscription of ${amount} (${currency.toUpperCase()})<br>
+              Socialbio System<br>  
 
-          `,
-      };
-      break;
-    case "payment_intent.succeeded":
-      log.warn("Pagamento com sucesso do usuario " + userFound.email);
-      userRecipient = {
-        name: userFound.firstName,
-        email: userFound.email,
-        subject: `[Socialbio] ${dictionary.payment}`,
-        language: "en",
-        message: `
-        <b>Hey ${userFound.firstName},</b><br>
-        <br>
-        Congratulations! Your payment was finished with success!<br>
-        You are now a ${getPlanByPriceId(
-          updatedSubscription.priceId
-        )} subscriber!<br>
-        Welcome onboard!<br>
-        <br>
-        <br>
-        Socialbio Team<br>
-        <a href"https://socialbio.me">https://www.socialbio.me</a>   
-        `,
-      };
-      break;
-    default:
-      console.log(`Unhandled event type ${event.type}`);
-      break;
+              `,
+            };
+            sendEmailToUser(systemRecipient);
+          }
+          break;
+        case "payment_intent.succeeded":
+          log.warn("Pagamento com sucesso do usuario " + userFound.email);
+          userRecipient = {
+            name: userFound.firstName,
+            email: userFound.email,
+            subject: `[Socialbio] ${dictionary.paymentSucceed}`,
+            language: "en",
+            message: `
+            <b>Hey ${userFound.firstName},</b><br>
+            <br>
+            Congratulations! Your payment was finished with success!<br>
+            You are now a ${getPlanByPriceId(
+              updatedSubscription.priceId
+            )} subscriber!<br>
+            Welcome onboard!<br>
+            <br>
+            <br>
+            Socialbio Team<br>
+            <a href"https://socialbio.me">https://www.socialbio.me</a>   
+            `,
+          };
+          break;
+        default:
+          console.log(`Unhandled event type ${event.type}`);
+          break;
+      }
+
+      if (userRecipient) sendEmailToUser(userRecipient);
+    }
   }
 
-  if (!userRecipient) return null;
-
-  sendEmailToUser(userRecipient);
-
-  res.status(200);
-};
-
-const getPriceIdByRecurrencyAndPlanType = (
-  recurrency: "month" | "year",
-  planType: PlansTypes
-) => {
-  if (planType === PlansTypes.VIP) {
-    if (recurrency === "month") {
-      return process.env.STRIPE_PRICE_VIP_MONTH_ID;
-    } else if (recurrency === "year") {
-      return process.env.STRIPE_PRICE_VIP_YEAR_ID;
-    }
-  } else if (planType === PlansTypes.PLATINUM) {
-    if (recurrency === "month") {
-      return process.env.STRIPE_PRICE_PLATINUM_MONTH_ID;
-    } else if (recurrency === "year") {
-      return process.env.STRIPE_PRICE_PLATINUM_YEAR_ID;
-    }
-  }
-  return undefined;
-};
-
-const getPlanByPriceId = (priceId: string) => {
-  if (
-    priceId === process.env.STRIPE_PRICE_VIP_MONTH_ID ||
-    priceId === process.env.STRIPE_PRICE_VIP_YEAR_ID
-  )
-    return PlansTypes.VIP;
-  else if (
-    priceId === process.env.STRIPE_PRICE_PLATINUM_MONTH_ID ||
-    priceId === process.env.STRIPE_PRICE_PLATINUM_YEAR_ID
-  )
-    return PlansTypes.PLATINUM;
-  else return PlansTypes.FREE;
+  return res.send();
 };

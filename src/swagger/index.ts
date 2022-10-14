@@ -5,7 +5,10 @@ import swaggerAutogen from "swagger-autogen";
 
 export const runSwaggerAutogen = async (apiVersion: string) => {
   const SWAGGER_OUTPUT_PATH = "./swagger_output.json";
-  const ROUTES_PATH = ["./src/routes/index.ts"];
+  const ROUTES_PATH = [
+    "./src/routes/client.routes.ts",
+    "./src/routes/webhooks.routes.ts",
+  ];
   const apiDescription = (await getPackageJson()).description;
 
   const doc = {

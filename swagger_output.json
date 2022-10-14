@@ -168,25 +168,14 @@
         }
       }
     },
-    "/webhooks/stripe/payment": {
+    "/stripe": {
       "post": {
         "tags": [
-          "Subscription"
+          "Webhooks"
         ],
-        "summary": "Gets a payment intent from Stripe",
-        "description": "Gets a payment intent from Stripe",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "stripe-signature",
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "summary": "Receives webhook events from Stripe",
+        "description": "Receives webhook events from Stripe",
+        "parameters": [],
         "responses": {
           "200": {
             "description": "Subscription created"
@@ -196,9 +185,6 @@
               "$ref": "#/definitions/Error"
             },
             "description": "Message of error"
-          },
-          "401": {
-            "description": "Unauthorized"
           },
           "500": {
             "description": "Message of error",
