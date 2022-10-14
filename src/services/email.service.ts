@@ -4,6 +4,7 @@ import { IEmailRecipient } from "../models/email.models";
 import { SYSTEM_EMAIL_CREDENTIALS } from "../constants";
 import { NOREPLY_EMAIL } from "./../constants/index";
 import { getDictionayByLanguage } from "./../utils/localization/index";
+import log from "../utils/logs";
 
 export const sendEmailToUser = async (userRecipient: IEmailRecipient) => {
   const { name, email, subject, message, language } = userRecipient;
@@ -28,6 +29,12 @@ export const sendEmailToUser = async (userRecipient: IEmailRecipient) => {
       text: message, // plain text body
       html: message,
     })
-    .then((emailInfo: SMTPTransport.SentMessageInfo) => emailInfo)
-    .catch(() => false);
+    .then((emailInfo: SMTPTransport.SentMessageInfo) => {
+      log.success(`Email successfuly sent to ${email}`);
+      return emailInfo;
+    })
+    .catch(() => {
+      log.error(`Error sending email to user ${email}`);
+      return false;
+    });
 };

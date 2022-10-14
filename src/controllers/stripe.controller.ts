@@ -279,10 +279,6 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
       description: 'Message of error'
     }
   */
-  const signature = req.headers["stripe-signature"];
-
-  console.log("-------", JSON.stringify(signature));
-
   try {
     stripeService.hookPaymentFromStripe(req, res);
   } catch (e: any) {

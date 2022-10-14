@@ -1,7 +1,8 @@
 import helmet from "helmet";
 import cors from "cors";
 import express from "express";
-import routes from "./routes";
+import routesClient from "./routes";
+import routesWebhooks from "./routes/webhooks.routes";
 import dotenvSafe from "dotenv-safe";
 import admin from "firebase-admin";
 import swaggerFile from "../swagger_output.json";
@@ -53,14 +54,13 @@ if (canReadEnv) {
     .then(() => {
       app.use(publicCors);
       app.use(helmet());
-      app.use(express.urlencoded({ extended: false }));
-      app.use(express.json());
       app.options("*", publicCors);
       app.use("/health-check", publicCors, (_, res) =>
         res.status(200).json({ message: "API running." })
       );
       app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
-      app.use("/api/v1", routes);
+      app.use("/api/v1/webhooks", routesWebhooks);
+      app.use("/api/v1", routesClient);
 
       const server = app.listen(PORT, () => {
         console.log(`Listening on port ${PORT}`);

@@ -187,22 +187,18 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
   let event;
 
   try {
-    log.info("req.body", JSON.stringify(req.body));
-    log.info("req.headers", JSON.stringify(req.headers));
     event = stripeInstance.webhooks.constructEvent(
       req.body,
       req.headers["stripe-signature"] as any,
       webhookSecret
     );
-    console.log("2");
-    return res.send();
+    res.send();
   } catch (error: any) {
     log.error(`Webhook Error ${error.message}`);
-    res.status(400).send(`Webhook Error: ${error.message}`);
+    return res.status(400).send(`Webhook Error: ${error.message}`);
   }
   if (!event) return null;
 
-  log.warn("PASSOU!!!");
   const paymentIntent: IPaymentIntent = event.data.object as IPaymentIntent;
 
   const updatedSubscription = await SubscriptionsDB.findOneAndUpdate(
@@ -234,10 +230,12 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
 
   const dictionary = getDictionayByLanguage("en");
   let userRecipient: IEmailRecipient | undefined = undefined;
+  log.warn("event.type: " + event.type);
 
   // Handle the event
   switch (event.type) {
     case "payment_intent.payment_failed":
+      log.warn("Pagamento falhou, do usuario " + userFound.email);
       userRecipient = {
         name: userFound.firstName,
         email: userFound.email,
@@ -253,6 +251,7 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
       };
       break;
     case "payment_intent.succeeded":
+      log.warn("Pagamento com sucesso do usuario " + userFound.email);
       userRecipient = {
         name: userFound.firstName,
         email: userFound.email,
@@ -269,7 +268,6 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
         `,
       };
       break;
-    // ... handle other event types
     default:
       console.log(`Unhandled event type ${event.type}`);
       break;

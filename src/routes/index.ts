@@ -4,6 +4,8 @@ import { verifyToken } from "../middlewares/auth";
 
 const router = express.Router();
 
+router.use(express.urlencoded({ extended: false }));
+router.use(express.json());
 /*
  * SUBSCRIPTION
  */
@@ -19,16 +21,6 @@ router.get(
   "/subscription/paymentintent/:paymentIntentId",
   verifyToken,
   stripeController.getSubsctriptionPaymentIntent
-);
-
-/*
- * Webhooks Stripe
- */
-
-router.post(
-  "/webhooks/stripe",
-  express.raw({ type: "application/json" }),
-  stripeController.hookPaymentFromStripe
 );
 
 export default router;
