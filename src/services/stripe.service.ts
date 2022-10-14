@@ -233,7 +233,7 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
     }
   );
 
-  log.info(`PaymentIntent: `, paymentIntent);
+  log.info(`PaymentIntent: `, JSON.stringify(paymentIntent));
   if (updatedSubscription) {
     log.warn(`22222222222`);
     const userFound = await UserDb.findOne({
