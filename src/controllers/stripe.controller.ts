@@ -252,7 +252,7 @@ export const getSubsctriptionPaymentIntent = async (
   }
 };
 
-export const hookPaymentFromStripe = async (req: Request, res: Response) => {
+export const hookEventsFromStripe = async (req: Request, res: Response) => {
   /* 
     #swagger.tags = ['Webhooks']
     #swagger.summary = 'Receives webhook events from Stripe'
@@ -276,7 +276,7 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
     }
   */
   try {
-    stripeService.hookPaymentFromStripe(req, res);
+    stripeService.hookEventsFromStripe(req, res);
   } catch (e: any) {
     log.error(
       "[StripeController.getSubsctriptionPaymentIntent] EXCEPTION: ",

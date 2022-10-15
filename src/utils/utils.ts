@@ -1,15 +1,3 @@
-export const log = (...msgs: any) => {
-  console.log(
-    "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-  );
-  msgs.forEach((msg: any) => {
-    console.log(">> ", msg);
-  });
-  console.log(
-    ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n"
-  );
-};
-
 export const replaceAllSpacesByUnderlines = (
   text: string,
   lowerCase: boolean = true
