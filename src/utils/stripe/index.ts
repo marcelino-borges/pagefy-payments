@@ -42,3 +42,12 @@ export const convertPaymentAmountToDecimalString = (int: number) => {
     asString.slice(asString.length - 2, asString.length)
   );
 };
+
+export const getLanguageFromCurrency = (currency: string) => {
+  switch (currency) {
+    case "brl":
+      return "pt";
+    default:
+      return "en";
+  }
+};

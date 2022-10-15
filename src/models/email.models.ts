@@ -3,5 +3,4 @@ export interface IEmailRecipient {
   email: string;
   message: string;
   subject: string;
-  language: "pt" | "en";
 }

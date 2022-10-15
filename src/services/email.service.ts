@@ -7,7 +7,7 @@ import { getDictionayByLanguage } from "./../utils/localization/index";
 import log from "../utils/logs";
 
 export const sendEmailToUser = async (userRecipient: IEmailRecipient) => {
-  const { name, email, subject, message, language } = userRecipient;
+  const { name, email, subject, message } = userRecipient;
 
   let transporter = nodemailer.createTransport({
     host: "smtp.office365.com",

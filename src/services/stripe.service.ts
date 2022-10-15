@@ -13,8 +13,10 @@ import { getDictionayByLanguage } from "../utils/localization";
 import { IEmailRecipient } from "../models/email.models";
 import { sendEmailToUser } from "./email.service";
 import log from "./../utils/logs";
+import { IInvoice } from "./../models/invoices.models";
 import {
   convertPaymentAmountToDecimalString,
+  getLanguageFromCurrency,
   getPlanByPriceId,
   getPriceIdByRecurrencyAndPlanType,
 } from "../utils/stripe";
@@ -212,8 +214,192 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, undefined, 500));
 
-  const paymentIntent: IPaymentIntent = event.data.object as IPaymentIntent;
+  if (event.type.includes("payment_intent")) {
+    handlePaymentIntent(event);
+  } else if (event.type.includes("invoice")) {
+    handleInvoice(event);
+  }
 
+  return res.send();
+};
+
+const handlePaymentIntent = async (event: any) => {
+  const paymentIntent: IPaymentIntent = event.data.object;
+
+  const userFound = await UserDb.findOne({
+    email: paymentIntent.receipt_email,
+  }).lean();
+
+  if (userFound) {
+    const currency = paymentIntent.currency;
+    const language = getLanguageFromCurrency(currency);
+    const dictionary = getDictionayByLanguage(language);
+    let userRecipient: IEmailRecipient | undefined = undefined;
+    const amount: string = convertPaymentAmountToDecimalString(
+      paymentIntent.amount_received
+    );
+
+    const updatedSubscription = await updateSubscriptionFromPaymentIntent(
+      paymentIntent
+    );
+
+    if (updatedSubscription) {
+      const plan = getPlanByPriceId(updatedSubscription.priceId);
+
+      switch (event.type) {
+        case "payment_intent.payment_failed":
+          log.warn(`⛈️ Pagamento do usuario ${userFound.email} falhou`);
+
+          userRecipient = {
+            name: userFound.firstName,
+            email: userFound.email,
+            subject: `[Socialbio] ${dictionary.payment}`,
+            message: `
+        <b>Hey ${userFound.firstName},</b><br>
+        <br>
+        Sorry, your payment failed!<br>
+        Please try to subscribe again.<br>
+        <a href"https://socialbio.me">Click here to try again.</a>        
+        <br>
+        <br>
+        Socialbio Team<br>  
+        `,
+          };
+          break;
+        case "payment_intent.succeeded":
+          log.success(
+            "💰 Pagamento com sucesso para o usuario " + userFound.email
+          );
+
+          const getEmailMessageByLanguage = (lang: string) => {
+            switch (lang) {
+              case "pt":
+                return `
+              <b>Olá, ${userFound.firstName}!</b><br>
+              <br>
+              Parabéns! Seu pagamento foi finalizado com sucesso!<br>
+              Agora você é um assinante ${plan}!<br>
+              Bem-vindo a bordo!<br>
+              <br>
+              <br>
+              Equipe Socialbio<br>
+              <a href"https://socialbio.me">https://www.socialbio.me</a>   
+              `;
+              default:
+                return `
+              <b>Hey ${userFound.firstName},</b><br>
+              <br>
+              Congratulations! Your payment was finished with success!<br>
+              You are now a ${getPlanByPriceId(
+                updatedSubscription.priceId
+              )} subscriber!<br>
+              Welcome onboard!<br>
+              <br>
+              <br>
+              Socialbio Team<br>
+              <a href"https://socialbio.me">https://www.socialbio.me</a>   
+              `;
+            }
+          };
+
+          userRecipient = {
+            name: userFound.firstName,
+            email: userFound.email,
+            subject: `[Socialbio] ${dictionary.paymentSucceed}`,
+            message: getEmailMessageByLanguage(language),
+          };
+
+          if (SYSTEM_EMAIL_CREDENTIALS?.user) {
+            const systemRecipient: IEmailRecipient = {
+              name: "System",
+              email: SYSTEM_EMAIL_CREDENTIALS.user,
+              subject: `[Socialbio] ${dictionary.payment}`,
+              message: `
+              <b>Hey Team!</b><br>
+              <br>
+              User ${userFound.firstName} (${
+                userFound.email
+              }) has just paid for a ${plan} subscription of ${amount} (${currency.toUpperCase()})<br>
+              Socialbio System<br>  
+              `,
+            };
+            sendEmailToUser(systemRecipient);
+          }
+          break;
+        default:
+          console.log(`Unhandled event type ${event.type}`);
+          break;
+      }
+    }
+  }
+};
+
+const handleInvoice = async (event: any) => {
+  const invoice: IInvoice = event.data.object as IInvoice;
+
+  const userFound = await UserDb.findOne({
+    email: invoice.customer_email,
+  }).lean();
+
+  if (userFound) {
+    const currency = invoice.currency;
+    const language = getLanguageFromCurrency(currency);
+    const dictionary = getDictionayByLanguage(language);
+    let userRecipient: IEmailRecipient | undefined = undefined;
+    const amount: string = convertPaymentAmountToDecimalString(
+      invoice.amount_paid
+    );
+
+    log.success(`📄 Nota fiscal ${userFound.email} disponível.`);
+
+    const getEmailMessageByLanguage = (lang: string) => {
+      switch (lang) {
+        case "pt":
+          return `
+          <b>Olá, ${userFound.firstName}!</b><br>
+          <br>
+          A nota fiscal para a sua nova assinatura já está disponível!<br>
+          Você pode visualizar e baixar aqui: <a href"${invoice.invoice_pdf}">CLICANDO AQUI</a><br>
+          <br>
+          <br>
+          Equipe Socialbio<br>
+          <a href"https://socialbio.me">https://www.socialbio.me</a>   
+          `;
+        default:
+          return `
+          <b>Hey ${userFound.firstName},</b><br>
+          <br>
+          The invoice for your new subscription is available!<br>
+          You can view and download <a href"${invoice.invoice_pdf}">CLICKING HERE</a><br>
+          <br>
+          <br>
+          Socialbio Team<br>
+          <a href"https://socialbio.me">https://www.socialbio.me</a>   
+          `;
+      }
+    };
+
+    switch (event.type) {
+      case "invoice.paid":
+        userRecipient = {
+          name: userFound.firstName,
+          email: userFound.email,
+          subject: `[Socialbio] ${dictionary.paymentSucceed}`,
+          message: getEmailMessageByLanguage(language),
+        };
+        break;
+      default:
+        log.error(`Unhandled event type ${event.type}`);
+        break;
+    }
+
+    if (userRecipient) sendEmailToUser(userRecipient);
+  }
+};
+
+const updateSubscriptionFromPaymentIntent = async (
+  paymentIntent: IPaymentIntent
+) => {
   const updatedSubscription = await SubscriptionsDB.findOneAndUpdate(
     {
       latestInvoice: {
@@ -232,96 +418,5 @@ export const hookPaymentFromStripe = async (req: Request, res: Response) => {
       new: true,
     }
   );
-
-  log.info(`PaymentIntent: `, JSON.stringify(paymentIntent));
-  if (updatedSubscription) {
-    log.warn(`22222222222`);
-    const userFound = await UserDb.findOne({
-      _id: updatedSubscription.userId,
-    }).lean();
-
-    if (userFound) {
-      log.warn(`33333`);
-      const dictionary = getDictionayByLanguage("en");
-      let userRecipient: IEmailRecipient | undefined = undefined;
-      log.warn("event.type: " + event.type);
-
-      // Handle the event
-      switch (event.type) {
-        case "payment_intent.payment_failed":
-          log.warn("Pagamento falhou, do usuario " + userFound.email);
-          userRecipient = {
-            name: userFound.firstName,
-            email: userFound.email,
-            subject: `[Socialbio] ${dictionary.payment}`,
-            language: "en",
-            message: `
-            <b>Hey ${userFound.firstName},</b><br>
-            <br>
-            Sorry, your payment failed!<br>
-            Please try to subscribe again.<br>
-            <a href"https://socialbio.me">Click here to try again.</a>        
-            <br>
-            <br>
-            Socialbio Team<br>  
-
-            `,
-          };
-
-          if (SYSTEM_EMAIL_CREDENTIALS?.user) {
-            const plan = getPlanByPriceId(updatedSubscription.priceId);
-            const amount: string = convertPaymentAmountToDecimalString(
-              paymentIntent.amount
-            );
-            const currency = paymentIntent.currency;
-            const systemRecipient: IEmailRecipient = {
-              name: "System",
-              email: SYSTEM_EMAIL_CREDENTIALS.user,
-              subject: `[Socialbio] ${dictionary.payment}`,
-              language: "en",
-              message: `
-              <b>Hey Team!</b><br>
-              <br>
-              User ${userFound.firstName} (${
-                userFound.email
-              }) has just paid for a ${plan} subscription of ${amount} (${currency.toUpperCase()})<br>
-              Socialbio System<br>  
-
-              `,
-            };
-            sendEmailToUser(systemRecipient);
-          }
-          break;
-        case "payment_intent.succeeded":
-          log.warn("Pagamento com sucesso do usuario " + userFound.email);
-          userRecipient = {
-            name: userFound.firstName,
-            email: userFound.email,
-            subject: `[Socialbio] ${dictionary.paymentSucceed}`,
-            language: "en",
-            message: `
-            <b>Hey ${userFound.firstName},</b><br>
-            <br>
-            Congratulations! Your payment was finished with success!<br>
-            You are now a ${getPlanByPriceId(
-              updatedSubscription.priceId
-            )} subscriber!<br>
-            Welcome onboard!<br>
-            <br>
-            <br>
-            Socialbio Team<br>
-            <a href"https://socialbio.me">https://www.socialbio.me</a>   
-            `,
-          };
-          break;
-        default:
-          console.log(`Unhandled event type ${event.type}`);
-          break;
-      }
-
-      if (userRecipient) sendEmailToUser(userRecipient);
-    }
-  }
-
-  return res.send();
+  return updatedSubscription;
 };
