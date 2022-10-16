@@ -1,6 +1,7 @@
 export interface IEmailRecipient {
   name: string;
   email: string;
-  message: string;
+  messageHTML: string;
+  messagePlainText: string;
   subject: string;
 }

@@ -16,6 +16,12 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.4.0] - 2022-10-16
+
+- Feature: Subscription endpoints
+- Feature: Webhooks to handle Stripe events of payment_intent.succeeded, payment_intent.failed and invoice.paid
+- Feature: email communications to the user and system when a payment is received and when an invoice is emitted (using enhanced html for the email body)
+
 ### [0.3.0] - 2022-10-13
 
 - Feature: Endpoint to get payment intent
