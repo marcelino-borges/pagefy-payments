@@ -189,6 +189,9 @@ export const createSubscriptionSchedule = async (
       return response;
     })
     .catch((error: any) => {
-      log.error("Error on createSubscriptionSchedule(): ", error.message);
+      log.error(
+        `Error on createSubscriptionSchedule() for the customerId ${customerId} on subscription ${subscriptionId}. `,
+        error.message
+      );
     });
 };

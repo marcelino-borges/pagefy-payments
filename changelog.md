@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.5.0] - 2022-10-17
+
+- Feature: Implemented createSubscriptionSchedule, called when a stripe hook is received for the payment_intent.succeeded.
+
 ### [0.4.0] - 2022-10-16
 
 - Feature: Subscription endpoints
