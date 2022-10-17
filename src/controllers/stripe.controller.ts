@@ -300,7 +300,11 @@ export const getUserSubsctriptions = async (req: Request, res: Response) => {
       return res
         .status(400)
         .json(
-          new AppResult(AppErrorsMessages.USER_HAS_NOT_SUBSCRIPTIONS, null, 400)
+          new AppResult(
+            AppErrorsMessages.USER_HAS_NOT_SUBSCRIPTIONS,
+            AppErrorsMessages.USER_HAS_NOT_SUBSCRIPTIONS,
+            400
+          )
         );
     }
 
