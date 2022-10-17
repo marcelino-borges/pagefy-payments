@@ -13,6 +13,7 @@ export interface ISubscriptionCreationResult {
   subscriptionId: string;
   subscriptionEnd: string;
   subscriptionStart: string;
+  subscriptionScheduleId?: string;
   currency: string;
   priceId: string;
   recurrency?: string;
@@ -93,10 +94,12 @@ const subscriptionSchema = new Schema<ISubscriptionCreationResult>(
     subscriptionId: { type: String },
     subscriptionEnd: { type: String },
     subscriptionStart: { type: String },
+    subscriptionScheduleId: { type: String },
     currency: { type: String },
     priceId: { type: String },
     recurrency: { type: String },
     customer: { type: Object },
+    paymentIntentId: { type: String },
     latestInvoice: { type: Object },
     userId: {
       type: Schema.Types.ObjectId,

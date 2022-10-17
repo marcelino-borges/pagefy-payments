@@ -45,6 +45,8 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
     handlePaymentIntent(event);
   } else if (event.type.includes("invoice")) {
     handleInvoice(event);
+  } else if (event.type.includes("subscription_schedule")) {
+    handleInvoice(event);
   }
 
   return res.send();

@@ -12,32 +12,11 @@ import SubscriptionsDB, {
 import log from "../../utils/logs";
 import { SYSTEM_EMAIL_CREDENTIALS } from "../../constants";
 import { sendEmailToUser } from "../email.service";
-import { getHTMLBody } from "../../utils/email";
-import { createSubscriptionSchedule } from "../stripe.service";
-
-export const updateSubscriptionFromPaymentIntent = async (
-  paymentIntent: IPaymentIntent
-) => {
-  const updatedSubscription = await SubscriptionsDB.findOneAndUpdate(
-    {
-      latestInvoice: {
-        payment_intent: {
-          id: paymentIntent.id,
-        },
-      },
-    },
-    {
-      latestInvoice: {
-        payment_intent: paymentIntent,
-      },
-      status: paymentIntent.status,
-    },
-    {
-      new: true,
-    }
-  );
-  return updatedSubscription;
-};
+import { getHTMLBody, getHTMLButton } from "../../utils/email";
+import {
+  createSubscriptionSchedule,
+  updateSubscriptionResultFromPaymentIntent,
+} from "../stripe.service";
 
 export const handlePaymentIntent = async (event: any) => {
   const paymentIntent: IPaymentIntent = event.data.object;
@@ -55,7 +34,7 @@ export const handlePaymentIntent = async (event: any) => {
       paymentIntent.amount_received
     );
 
-    const updatedSubscription = await updateSubscriptionFromPaymentIntent(
+    const updatedSubscription = await updateSubscriptionResultFromPaymentIntent(
       paymentIntent
     );
 
@@ -74,14 +53,17 @@ export const handlePaymentIntent = async (event: any) => {
                   <b>Olá, ${userFound.firstName}!</b><br>
                   <br>
                   Desculpe! Seu pagamento falhou!<br>
-                  Por favor tente fazer sua assinatura novamente 
-                  <a href="https://socialbio.me">CLICANDO AQUI</a> ou abrindo esse link no seu navegador: https://socialbio.me.
+                  Por favor tente fazer sua assinatura novamente<br>
+                  <br>
+                  ${getHTMLButton("https://socialbio.me", "CLIQUE AQUI")}<br>
+                  <br>
+                  ou abra esse link no seu navegador: https://socialbio.me.<br>
                   <br>
                   <br>
                   Equipe Socialbio<br> 
                   `),
                   text: `
-                  Olá, ${userFound.firstName}! Parabéns, seu pagamento foi finalizado com sucesso! Agora você é um assinante ${plan}! Bem-vindo a bordo! Equipe Socialbio (https://www.socialbio.me)`,
+                  Olá, ${userFound.firstName}! Desculpe! Seu pagamento falhou! Por favor tente fazer sua assinatura novamente no https://socialbio.me. Equipe Socialbio`,
                 };
               default:
                 return {
@@ -90,7 +72,10 @@ export const handlePaymentIntent = async (event: any) => {
                   <br>
                   Sorry, your payment failed!<br>
                   Please try to subscribe again.<br>
-                  <a href="https://socialbio.me">Click here to try again</a> or open this link your browser: https://socialbio.me.
+                  <br>
+                  ${getHTMLButton("https://socialbio.me", "CLICK HERE")}<br>
+                  <br>
+                  or open this link your browser: https://socialbio.me.
                   <br>
                   <br>
                   Socialbio Team<br>  
@@ -123,8 +108,19 @@ export const handlePaymentIntent = async (event: any) => {
             await SubscriptionsDB.findOne({ paymentIntentId: paymentIntent.id })
           )?.subscriptionId;
 
-          if (customerId && subscriptionId)
-            createSubscriptionSchedule(customerId, subscriptionId);
+          if (customerId && subscriptionId) {
+            const schedule = await createSubscriptionSchedule(
+              customerId,
+              subscriptionId
+            );
+
+            if (schedule) {
+              await SubscriptionsDB.findOneAndUpdate(
+                { subscriptionId: updatedSubscription.subscriptionId },
+                { subscriptionScheduleId: schedule.id }
+              );
+            }
+          }
 
           const getEmailMessageByLanguage = (lang: string) => {
             switch (lang) {
@@ -206,6 +202,7 @@ export const handlePaymentIntent = async (event: any) => {
           console.log(`Unhandled event type ${event.type}`);
           break;
       }
+      if (userRecipient) sendEmailToUser(userRecipient);
     }
   }
 };

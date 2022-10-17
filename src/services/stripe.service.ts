@@ -3,6 +3,7 @@ import stripe, { initializeStripe } from "../config/stripe";
 import { AppErrorsMessages } from "../constants";
 import { IUser, PlansTypes } from "../models/user.models";
 import SubscriptionsDB, {
+  IPaymentIntent,
   ISubscriptionCreationResult,
   SubscriptionStatus,
 } from "../models/subscription.models";
@@ -154,6 +155,30 @@ export const saveSubscriptionResult = async (
   return (
     await SubscriptionsDB.create(subscription)
   ).toObject() as ISubscriptionCreationResult;
+};
+
+export const updateSubscriptionResultFromPaymentIntent = async (
+  paymentIntent: IPaymentIntent
+) => {
+  const updatedSubscription = await SubscriptionsDB.findOneAndUpdate(
+    {
+      latestInvoice: {
+        payment_intent: {
+          id: paymentIntent.id,
+        },
+      },
+    },
+    {
+      latestInvoice: {
+        payment_intent: paymentIntent,
+      },
+      status: paymentIntent.status,
+    },
+    {
+      new: true,
+    }
+  );
+  return updatedSubscription;
 };
 
 export const updateSubscriptionResult = async (
