@@ -1,18 +1,13 @@
 import Stripe from "stripe";
 import stripe, { initializeStripe } from "../config/stripe";
 import { AppErrorsMessages } from "../constants";
-import AppResult from "../errors/app-error";
 import { IUser, PlansTypes } from "../models/user.models";
-import { Request, Response } from "express";
 import SubscriptionsDB, {
-  IPaymentIntent,
   ISubscriptionCreationResult,
   SubscriptionStatus,
 } from "../models/subscription.models";
-import log from "./../utils/logs";
 import { getPriceIdByRecurrencyAndPlanType } from "../utils/stripe";
-import { handlePaymentIntent } from "./webhooks/payment-intent.service";
-import { handleInvoice } from "./webhooks/invoice.service";
+import log from "../utils/logs";
 
 let stripeInstance: Stripe | null = stripe;
 
@@ -175,43 +170,25 @@ export const updateSubscriptionResult = async (
   )?.toObject();
 };
 
-export const hookEventsFromStripe = async (req: Request, res: Response) => {
+export const createSubscriptionSchedule = async (
+  customerId: string,
+  subscriptionId: string
+) => {
   if (!stripeInstance) stripeInstance = await initializeStripe();
-  if (!stripeInstance)
-    return res
-      .status(500)
-      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, undefined, 500));
 
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!stripeInstance) return null;
 
-  if (!webhookSecret) {
-    throw new Error(AppErrorsMessages.INTERNAL_ERROR);
-  }
-
-  let event;
-
-  try {
-    event = stripeInstance.webhooks.constructEvent(
-      req.body,
-      req.headers["stripe-signature"] as any,
-      webhookSecret
-    );
-  } catch (error: any) {
-    log.error(`Webhook Error ${error.message}`);
-    return res
-      .status(500)
-      .json(new AppResult(`Webhook Error`, error.message, 500));
-  }
-  if (!event)
-    return res
-      .status(500)
-      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, undefined, 500));
-
-  if (event.type.includes("payment_intent")) {
-    handlePaymentIntent(event);
-  } else if (event.type.includes("invoice")) {
-    handleInvoice(event);
-  }
-
-  return res.send();
+  return stripeInstance.subscriptionSchedules
+    .create({
+      customer: customerId,
+      start_date: Math.floor(new Date().getTime() / 1000),
+      end_behavior: "cancel",
+      from_subscription: subscriptionId,
+    })
+    .then((response: Stripe.Response<Stripe.SubscriptionSchedule>) => {
+      return response;
+    })
+    .catch((error: any) => {
+      log.error("Error on createSubscriptionSchedule(): ", error.message);
+    });
 };

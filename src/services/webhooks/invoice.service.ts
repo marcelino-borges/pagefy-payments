@@ -40,7 +40,7 @@ export const handleInvoice = async (event: any) => {
               ${getHTMLButton(invoice.invoice_pdf, "NOTA FISCAL")}
               <br>
               <br>
-              ou abrindo esse link no seu navegador: ${invoice.invoice_pdf}.<br>
+              ou abrindo esse link no seu navegador: ${invoice.invoice_pdf}<br>
               <br>
               <br>
               ${getHTMLFooterByLanguage(language)}

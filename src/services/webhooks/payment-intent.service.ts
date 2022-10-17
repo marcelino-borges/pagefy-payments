@@ -8,13 +8,12 @@ import {
 } from "../../utils/stripe";
 import SubscriptionsDB, {
   IPaymentIntent,
-  ISubscriptionCreationResult,
-  SubscriptionStatus,
 } from "../../models/subscription.models";
 import log from "../../utils/logs";
 import { SYSTEM_EMAIL_CREDENTIALS } from "../../constants";
 import { sendEmailToUser } from "../email.service";
 import { getHTMLBody } from "../../utils/email";
+import { createSubscriptionSchedule } from "../stripe.service";
 
 export const updateSubscriptionFromPaymentIntent = async (
   paymentIntent: IPaymentIntent
@@ -115,6 +114,17 @@ export const handlePaymentIntent = async (event: any) => {
           log.success(
             "💰 Pagamento com sucesso para o usuario " + userFound.email
           );
+
+          let customerId = "";
+          if (paymentIntent.customer.id) customerId = paymentIntent.customer.id;
+          else customerId = paymentIntent.customer;
+
+          const subscriptionId = (
+            await SubscriptionsDB.findOne({ paymentIntentId: paymentIntent.id })
+          )?.subscriptionId;
+
+          if (customerId && subscriptionId)
+            createSubscriptionSchedule(customerId, subscriptionId);
 
           const getEmailMessageByLanguage = (lang: string) => {
             switch (lang) {

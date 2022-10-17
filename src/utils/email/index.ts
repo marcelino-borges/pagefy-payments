@@ -7,7 +7,8 @@ export const getHTMLFooterByLanguage = (language: string) => {
     case "en":
       return `Socialbio Team<br>
         <a href="https://socialbio.me">https://www.socialbio.me</a><br>
-        <img src="https://firebasestorage.googleapis.com/v0/b/socialbio-41362.appspot.com/o/system%2Fimages%2Fbranding%2Flogo%2Fsocialbio-logo-whitebg-horizontal.jpg?alt=media&token=032a2436-2c7c-435e-acc0-7f3a420fd1d0" alt="Logo Socialbio" height="90px" />`;
+        <a href="https://socialbio.me"><img src="https://firebasestorage.googleapis.com/v0/b/socialbio-41362.appspot.com/o/system%2Fimages%2Fbranding%2Flogo%2Fsocialbio-logo-whitebg-horizontal.jpg?alt=media&token=032a2436-2c7c-435e-acc0-7f3a420fd1d0" alt="Logo Socialbio" height="90px" /></a><br>
+        `;
   }
 };
 

@@ -11,6 +11,7 @@ import log from "../utils/logs";
 import Stripe from "stripe";
 import { IUser } from "./../models/user.models";
 import { updateUser } from "./../services/user.service";
+import * as stripeWebhooks from "../services/webhooks";
 
 export const createSubsctription = async (req: Request, res: Response) => {
   /* 
@@ -102,23 +103,29 @@ export const createSubsctription = async (req: Request, res: Response) => {
         );
     }
 
+    const invoice = subscription.latest_invoice as Stripe.Invoice;
+    const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent;
+
     const subscriptionResult: ISubscriptionCreationResult = {
       subscriptionId: subscription.id,
-      subscriptionEnd: new Date(subscription.current_period_end).toISOString(),
+      subscriptionEnd: new Date(
+        subscription.current_period_end * 1000
+      ).toISOString(),
       subscriptionStart: new Date(
-        subscription.current_period_start
+        subscription.current_period_start * 1000
       ).toISOString(),
       currency: subscription.items.data[0].price.currency,
       priceId: subscription.items.data[0].price.id,
       recurrency: subscription.items.data[0].price.recurring?.interval,
       customer: subscription.customer,
-      latestInvoice: subscription.latest_invoice,
+      paymentIntentId: paymentIntent.id,
+      latestInvoice: invoice,
       userId: userWithPaymentId._id,
       status: subscription.status,
     };
 
-    if (subscriptionResult.latestInvoice?.client_secret)
-      subscriptionResult.latestInvoice.client_secret = null;
+    if (paymentIntent?.client_secret)
+      subscriptionResult.latestInvoice.payment_intent.client_secret = null;
 
     const subscriptionSaved = await stripeService.saveSubscriptionResult(
       subscriptionResult
@@ -276,7 +283,7 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
     }
   */
   try {
-    stripeService.hookEventsFromStripe(req, res);
+    stripeWebhooks.hookEventsFromStripe(req, res);
   } catch (e: any) {
     log.error(
       "[StripeController.getSubsctriptionPaymentIntent] EXCEPTION: ",

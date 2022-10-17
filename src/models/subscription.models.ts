@@ -17,6 +17,7 @@ export interface ISubscriptionCreationResult {
   priceId: string;
   recurrency?: string;
   customer: any;
+  paymentIntentId?: string;
   latestInvoice: any;
   userId: string;
   status: string;
