@@ -22,5 +22,10 @@ router.get(
   verifyToken,
   stripeController.getSubsctriptionPaymentIntent
 );
+router.get(
+  "/subscription/user/:userId",
+  verifyToken,
+  stripeController.getUserSubsctriptions
+);
 
 export default router;

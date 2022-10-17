@@ -4,12 +4,10 @@ import { getDictionayByLanguage } from "../../utils/localization";
 import log from "../../utils/logs";
 import { getLanguageFromCurrency } from "../../utils/stripe";
 import { sendEmailToUser } from "../email.service";
+import * as subscriptionsResultsDB from "../subscriptions-results.service";
 import UserDb from "../../models/user.models";
-import {
-  getHTMLBody,
-  getHTMLButton,
-  getHTMLFooterByLanguage,
-} from "../../utils/email";
+import { getHTMLBody, getHTMLButton } from "../../utils/email";
+import { ISubscriptionCreationResult } from "../../models/subscription.models";
 
 export const handleSubscriptionSchedule = async (event: any) => {
   const invoice: IInvoice = event.data.object as IInvoice;
@@ -26,6 +24,17 @@ export const handleSubscriptionSchedule = async (event: any) => {
 
     switch (event.type) {
       case "subscription_schedule.canceled": {
+        const canceledSubscription: ISubscriptionCreationResult | undefined =
+          await subscriptionsResultsDB.cancelSubscriptionResult(
+            invoice.subscription
+          );
+
+        if (!canceledSubscription) {
+          log.error(
+            "Failed to cancel subscription on Mongo, on 'subscription_schedule.canceled' webhook event."
+          );
+        }
+
         const getEmailMessageByLanguage = (lang: string) => {
           switch (lang) {
             case "pt":

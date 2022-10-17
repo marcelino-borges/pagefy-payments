@@ -13,10 +13,8 @@ import log from "../../utils/logs";
 import { SYSTEM_EMAIL_CREDENTIALS } from "../../constants";
 import { sendEmailToUser } from "../email.service";
 import { getHTMLBody, getHTMLButton } from "../../utils/email";
-import {
-  createSubscriptionSchedule,
-  updateSubscriptionResultFromPaymentIntent,
-} from "../stripe.service";
+import * as stripeService from "../stripe.service";
+import * as subscriptionsResultsService from "../subscriptions-results.service";
 
 export const handlePaymentIntent = async (event: any) => {
   const paymentIntent: IPaymentIntent = event.data.object;
@@ -34,9 +32,10 @@ export const handlePaymentIntent = async (event: any) => {
       paymentIntent.amount_received
     );
 
-    const updatedSubscription = await updateSubscriptionResultFromPaymentIntent(
-      paymentIntent
-    );
+    const updatedSubscription =
+      await subscriptionsResultsService.updateSubscriptionResultFromPaymentIntent(
+        paymentIntent
+      );
 
     if (updatedSubscription) {
       const plan = getPlanByPriceId(updatedSubscription.priceId);
@@ -109,7 +108,7 @@ export const handlePaymentIntent = async (event: any) => {
           )?.subscriptionId;
 
           if (customerId && subscriptionId) {
-            const schedule = await createSubscriptionSchedule(
+            const schedule = await stripeService.createSubscriptionSchedule(
               customerId,
               subscriptionId
             );

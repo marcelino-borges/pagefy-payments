@@ -1,4 +1,4 @@
-import {
+import SubscriptionsDB, {
   ICreateSubscriptionProps,
   ISubscriptionCreationResult,
 } from "../models/subscription.models";
@@ -12,6 +12,7 @@ import Stripe from "stripe";
 import { IUser } from "./../models/user.models";
 import { updateUser } from "./../services/user.service";
 import * as stripeWebhooks from "../services/webhooks";
+import * as subscriptionsResultsService from "./../services/subscriptions-results.service";
 
 export const createSubsctription = async (req: Request, res: Response) => {
   /* 
@@ -127,9 +128,10 @@ export const createSubsctription = async (req: Request, res: Response) => {
     if (paymentIntent?.client_secret)
       subscriptionResult.latestInvoice.payment_intent.client_secret = null;
 
-    const subscriptionSaved = await stripeService.saveSubscriptionResult(
-      subscriptionResult
-    );
+    const subscriptionSaved =
+      await subscriptionsResultsService.saveSubscriptionResult(
+        subscriptionResult
+      );
 
     if (!subscriptionSaved) {
       return res
@@ -253,6 +255,58 @@ export const getSubsctriptionPaymentIntent = async (
       "[StripeController.getSubsctriptionPaymentIntent] EXCEPTION: ",
       e
     );
+    return res
+      .status(500)
+      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
+  }
+};
+
+export const getUserSubsctriptions = async (req: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Subscription']
+    #swagger.summary = 'Gets all subscriptions belonging to an user'
+    #swagger.description  = 'Gets all subscriptions belonging to an user'
+    #swagger.parameters['userId'] = {
+      in: 'params',
+      description: 'User ID',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      description: 'Subscription created'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+  const { userId } = req.params;
+
+  if (!userId) {
+    return res
+      .status(400)
+      .json(new AppResult(AppErrorsMessages.MISSING_PROPS, null, 400));
+  }
+
+  try {
+    const subscriptions: any =
+      subscriptionsResultsService.getUserSubsctriptions(userId);
+
+    if (!subscriptions?.length) {
+      return res
+        .status(400)
+        .json(
+          new AppResult(AppErrorsMessages.USER_HAS_NOT_SUBSCRIPTIONS, null, 400)
+        );
+    }
+
+    return res.status(200).json(subscriptions);
+  } catch (e: any) {
+    log.error("[StripeController.getUserSubsctriptions] EXCEPTION: ", e);
     return res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
