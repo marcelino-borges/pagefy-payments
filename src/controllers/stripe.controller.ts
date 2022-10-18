@@ -125,6 +125,8 @@ export const createSubsctription = async (req: Request, res: Response) => {
       status: subscription.status,
     };
 
+    let clientSecret = paymentIntent?.client_secret;
+
     if (paymentIntent?.client_secret)
       subscriptionResult.latestInvoice.payment_intent.client_secret = null;
 
@@ -141,6 +143,7 @@ export const createSubsctription = async (req: Request, res: Response) => {
         );
     }
 
+    subscriptionSaved.latestInvoice.payment_intent.client_secret = clientSecret;
     return res.status(201).json(subscriptionSaved);
   } catch (e: any) {
     log.error("[StripeController.createSubsctription] EXCEPTION: ", e);
