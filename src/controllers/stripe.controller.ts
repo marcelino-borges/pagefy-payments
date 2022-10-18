@@ -294,7 +294,7 @@ export const getUserSubsctriptions = async (req: Request, res: Response) => {
 
   try {
     const subscriptions: any =
-      subscriptionsResultsService.getUserSubsctriptions(userId);
+      await subscriptionsResultsService.getUserSubsctriptions(userId);
 
     if (!subscriptions?.length) {
       return res

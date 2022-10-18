@@ -20,7 +20,7 @@ export interface ISubscriptionCreationResult {
   customer: any;
   paymentIntentId?: string;
   latestInvoice: any;
-  userId: string;
+  userId: any;
   status: string;
 }
 
