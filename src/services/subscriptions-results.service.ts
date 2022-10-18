@@ -2,11 +2,16 @@ import SubscriptionsDB, {
   IPaymentIntent,
   ISubscriptionCreationResult,
 } from "../models/subscription.models";
+import { Types } from "mongoose";
 
 export const getUserSubsctriptions = async (userId: string) => {
   return await SubscriptionsDB.find({
-    userId,
-  });
+    userId: userId,
+  })
+    .exec()
+    .then((subscriptions: any) => {
+      return subscriptions;
+    });
 };
 
 export const saveSubscriptionResult = async (
