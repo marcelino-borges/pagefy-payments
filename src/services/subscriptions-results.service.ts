@@ -22,9 +22,6 @@ export const saveSubscriptionResult = async (
 export const updateSubscriptionResultFromPaymentIntent = async (
   paymentIntent: IPaymentIntent
 ) => {
-  console.log(
-    "looking for PI " + paymentIntent.id + " status " + paymentIntent.status
-  );
   return await SubscriptionsDB.findOneAndUpdate(
     {
       "latestInvoice.payment_intent.id": paymentIntent.id,
@@ -40,8 +37,6 @@ export const updateSubscriptionResultFromPaymentIntent = async (
     },
     (error: CallbackError, doc: any) => {
       if (error) log.error("error", error);
-      log.error("doc found", doc);
-      log.error("doc found status", doc.status);
     }
   );
 };
