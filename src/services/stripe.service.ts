@@ -144,7 +144,6 @@ export const createSubscriptionSchedule = async (subscriptionId: string) => {
 
   return stripeInstance.subscriptionSchedules
     .create({
-      end_behavior: "cancel",
       from_subscription: subscriptionId,
     })
     .then((response: Stripe.Response<Stripe.SubscriptionSchedule>) => {
