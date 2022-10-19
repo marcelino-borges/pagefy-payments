@@ -296,7 +296,7 @@ export const getUserSubsctriptions = async (req: Request, res: Response) => {
   }
 
   try {
-    const subscriptions: any =
+    const subscriptions: ISubscriptionCreationResult[] =
       await subscriptionsResultsService.getUserSubsctriptions(userId);
 
     if (!subscriptions?.length) {
@@ -311,7 +311,11 @@ export const getUserSubsctriptions = async (req: Request, res: Response) => {
         );
     }
 
-    return res.status(200).json(subscriptions);
+    const filteredSubscriptions = subscriptions.filter(
+      (sub: ISubscriptionCreationResult) => sub.status !== "incomplete"
+    );
+
+    return res.status(200).json(filteredSubscriptions);
   } catch (e: any) {
     log.error("[StripeController.getUserSubsctriptions] EXCEPTION: ", e);
     return res
