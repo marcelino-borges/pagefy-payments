@@ -11,8 +11,8 @@ import SubscriptionsDB, {
 } from "../../models/subscription.models";
 import log from "../../utils/logs";
 import { SYSTEM_EMAIL_CREDENTIALS } from "../../constants";
-import { sendEmailToUser } from "../email.service";
 import { getHTMLBody, getHTMLButton } from "../../utils/email";
+import { sendEmailToUser } from "../email.service";
 import * as stripeService from "../stripe.service";
 import * as subscriptionsResultsService from "../subscriptions-results.service";
 

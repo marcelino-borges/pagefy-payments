@@ -344,12 +344,9 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
     }
   */
   try {
-    stripeWebhooks.hookEventsFromStripe(req, res);
+    return await stripeWebhooks.hookEventsFromStripe(req, res);
   } catch (e: any) {
-    log.error(
-      "[StripeController.getSubsctriptionPaymentIntent] EXCEPTION: ",
-      e
-    );
+    log.error("[StripeController.hookEventsFromStripe] EXCEPTION: ", e);
     return res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));

@@ -41,6 +41,7 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, undefined, 500));
 
+  console.log("🔔 Received event " + event.type);
   if (event.type.includes("payment_intent")) {
     handlePaymentIntent(event);
   } else if (event.type.includes("invoice")) {
