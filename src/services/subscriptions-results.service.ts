@@ -20,7 +20,7 @@ export const saveSubscriptionResult = async (
 export const updateSubscriptionResultFromPaymentIntent = async (
   paymentIntent: IPaymentIntent
 ) => {
-  const updatedSubscription = await SubscriptionsDB.findOneAndUpdate(
+  return await SubscriptionsDB.findOneAndUpdate(
     {
       latestInvoice: {
         payment_intent: {
@@ -38,7 +38,6 @@ export const updateSubscriptionResultFromPaymentIntent = async (
       new: true,
     }
   );
-  return updatedSubscription;
 };
 
 export const updateSubscriptionResult = async (

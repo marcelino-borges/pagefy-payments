@@ -10,6 +10,7 @@ import {
   getHTMLButton,
   getHTMLFooterByLanguage,
 } from "../../utils/email";
+import { createOrUpdatePaidInvoice } from "../invoice.service";
 
 export const handleInvoice = async (event: any) => {
   const invoice: IInvoice = event.data.object as IInvoice;
@@ -17,6 +18,8 @@ export const handleInvoice = async (event: any) => {
   const userFound = await UserDb.findOne({
     email: invoice.customer_email,
   }).lean();
+
+  invoice.userId = userFound?._id;
 
   if (userFound) {
     const currency = invoice.currency;
@@ -80,6 +83,13 @@ export const handleInvoice = async (event: any) => {
           messageHTML: getEmailMessageByLanguage(language).html,
           messagePlainText: getEmailMessageByLanguage(language).text,
         };
+
+        const invoicePersisted = await createOrUpdatePaidInvoice(invoice);
+        if (!invoicePersisted)
+          log.error(
+            `[webhooks/invoice.service/handleInvoice()] Error: Invoice ${invoice.id} not persisted to mongo`
+          );
+
         break;
       }
       default:

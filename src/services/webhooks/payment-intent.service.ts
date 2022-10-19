@@ -202,6 +202,8 @@ export const handlePaymentIntent = async (event: any) => {
           break;
       }
       if (userRecipient) sendEmailToUser(userRecipient);
+    } else {
+      log.error(`Error udpdating payment intent ${paymentIntent.id} on Mongo`);
     }
   }
 };

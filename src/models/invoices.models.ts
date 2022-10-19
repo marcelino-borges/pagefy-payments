@@ -1,7 +1,9 @@
 import { model, Schema } from "mongoose";
 
 export interface IInvoice {
+  _id?: string;
   id: string;
+  userId?: string;
   account_country: string;
   account_name: string;
   amount_due: number;
@@ -52,9 +54,13 @@ export interface IInvoice {
   webhooks_delivered_at: number;
 }
 
-const invoicesSchema = new Schema<IInvoice>(
+const invoiceSchema = new Schema<IInvoice>(
   {
     id: { type: String },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "Users",
+    },
     account_country: { type: String },
     account_name: { type: String },
     amount_due: { type: Number },
@@ -110,4 +116,4 @@ const invoicesSchema = new Schema<IInvoice>(
   }
 );
 
-export default model<IInvoice>("Invoices", invoicesSchema);
+export default model<IInvoice>("Invoices", invoiceSchema);
