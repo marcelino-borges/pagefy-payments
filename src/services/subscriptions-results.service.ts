@@ -1,7 +1,9 @@
+import { CallbackError } from "mongoose";
 import SubscriptionsDB, {
   IPaymentIntent,
   ISubscriptionCreationResult,
 } from "../models/subscription.models";
+import log from "../utils/logs";
 
 export const getUserSubsctriptions = async (userId: string) => {
   return await SubscriptionsDB.find({
@@ -36,6 +38,9 @@ export const updateSubscriptionResultFromPaymentIntent = async (
     },
     {
       new: true,
+    },
+    (error: CallbackError, doc: any) => {
+      log.error(error);
     }
   );
 };
