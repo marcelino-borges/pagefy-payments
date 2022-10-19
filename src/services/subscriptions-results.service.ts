@@ -22,6 +22,9 @@ export const saveSubscriptionResult = async (
 export const updateSubscriptionResultFromPaymentIntent = async (
   paymentIntent: IPaymentIntent
 ) => {
+  console.log(
+    "looking for PI " + paymentIntent.id + " status " + paymentIntent.status
+  );
   return await SubscriptionsDB.findOneAndUpdate(
     {
       latestInvoice: {
