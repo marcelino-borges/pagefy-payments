@@ -27,11 +27,7 @@ export const updateSubscriptionResultFromPaymentIntent = async (
   );
   return await SubscriptionsDB.findOneAndUpdate(
     {
-      latestInvoice: {
-        payment_intent: {
-          id: paymentIntent.id,
-        },
-      },
+      "latestInvoice.payment_intent.id": paymentIntent.id,
     },
     {
       latestInvoice: {
