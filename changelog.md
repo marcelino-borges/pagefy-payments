@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.6.1] - 2022-10-19
+
+- Fix: Webhook fix to return from controller
+
 ### [0.6.0] - 2022-10-17
 
 - Feature: Implemented endpoint to get all user subscriptions
