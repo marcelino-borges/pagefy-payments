@@ -99,17 +99,12 @@ export const handlePaymentIntent = async (event: any) => {
             "💰 Pagamento com sucesso para o usuario " + userFound.email
           );
 
-          let customerId = "";
-          if (paymentIntent.customer.id) customerId = paymentIntent.customer.id;
-          else customerId = paymentIntent.customer;
-
           const subscriptionId = (
             await SubscriptionsDB.findOne({ paymentIntentId: paymentIntent.id })
           )?.subscriptionId;
 
-          if (customerId && subscriptionId) {
+          if (subscriptionId) {
             const schedule = await stripeService.createSubscriptionSchedule(
-              customerId,
               subscriptionId
             );
 

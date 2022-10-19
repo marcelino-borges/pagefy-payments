@@ -138,16 +138,12 @@ export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
   return subscriptionUpdated;
 };
 
-export const createSubscriptionSchedule = async (
-  customerId: string,
-  subscriptionId: string
-) => {
+export const createSubscriptionSchedule = async (subscriptionId: string) => {
   let stripeInstance: Stripe | null = await initializeStripe();
   if (!stripeInstance) return null;
 
   return stripeInstance.subscriptionSchedules
     .create({
-      customer: customerId,
       start_date: Math.floor(new Date().getTime() / 1000),
       end_behavior: "cancel",
       from_subscription: subscriptionId,
@@ -157,7 +153,7 @@ export const createSubscriptionSchedule = async (
     })
     .catch((error: any) => {
       log.error(
-        `Error on createSubscriptionSchedule() for the customerId ${customerId} on subscription ${subscriptionId}. `,
+        `Error on createSubscriptionSchedule() for subscription ${subscriptionId}. `,
         error.message
       );
     });
