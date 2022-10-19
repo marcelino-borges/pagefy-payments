@@ -42,6 +42,7 @@ export const updateSubscriptionResultFromPaymentIntent = async (
     (error: CallbackError, doc: any) => {
       if (error) log.error("error", error);
       log.error("doc found", doc);
+      log.error("doc found status", doc.status);
     }
   );
 };
