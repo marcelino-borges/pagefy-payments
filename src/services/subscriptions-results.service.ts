@@ -34,9 +34,6 @@ export const updateSubscriptionResultFromPaymentIntent = async (
     },
     {
       new: true,
-    },
-    (error: CallbackError, doc: any) => {
-      if (error) log.error("error", error);
     }
   );
 };

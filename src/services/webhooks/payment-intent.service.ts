@@ -11,7 +11,11 @@ import SubscriptionsDB, {
 } from "../../models/subscription.models";
 import log from "../../utils/logs";
 import { SYSTEM_EMAIL_CREDENTIALS } from "../../constants";
-import { getHTMLBody, getHTMLButton } from "../../utils/email";
+import {
+  getHTMLBody,
+  getHTMLButton,
+  getHTMLFooterByLanguage,
+} from "../../utils/email";
 import { sendEmailToUser } from "../email.service";
 import * as stripeService from "../stripe.service";
 import * as subscriptionsResultsService from "../subscriptions-results.service";
@@ -59,7 +63,7 @@ export const handlePaymentIntent = async (event: any) => {
                   ou abra esse link no seu navegador: https://socialbio.me.<br>
                   <br>
                   <br>
-                  Equipe Socialbio<br> 
+                  ${getHTMLFooterByLanguage(language)}
                   `),
                   text: `
                   Olá, ${userFound.firstName}! Desculpe! Seu pagamento falhou! Por favor tente fazer sua assinatura novamente no https://socialbio.me. Equipe Socialbio`,
@@ -77,7 +81,7 @@ export const handlePaymentIntent = async (event: any) => {
                   or open this link your browser: https://socialbio.me.
                   <br>
                   <br>
-                  Socialbio Team<br>  
+                  ${getHTMLFooterByLanguage(language)}
                   `,
                   text: `
                   Hey ${userFound.firstName}! Sorry, your payment failed! Please try to subscribe again. Try again opening this link in your browser: https://socialbio.me. Socialbio Team`,
@@ -128,7 +132,7 @@ export const handlePaymentIntent = async (event: any) => {
               Bem-vindo a bordo!<br>
               <br>
               <br>
-              Equipe Socialbio<br>
+              ${getHTMLFooterByLanguage(language)}
               <a href="https://socialbio.me">https://www.socialbio.me</a>   
               `),
                   text: `
@@ -147,7 +151,7 @@ export const handlePaymentIntent = async (event: any) => {
               Welcome onboard!<br>
               <br>
               <br>
-              Socialbio Team<br>
+              ${getHTMLFooterByLanguage(language)}
               <a href="https://socialbio.me">https://www.socialbio.me</a>   
               `),
                   text: `
