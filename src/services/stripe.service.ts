@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import stripe, { initializeStripe } from "../config/stripe";
+import { initializeStripe } from "../config/stripe";
 import { AppErrorsMessages } from "../constants";
 import { IUser, PlansTypes } from "../models/user.models";
 import SubscriptionsDB, {
@@ -10,13 +10,10 @@ import SubscriptionsDB, {
 import { getPriceIdByRecurrencyAndPlanType } from "../utils/stripe";
 import log from "../utils/logs";
 
-let stripeInstance: Stripe | null = stripe;
-
 export const createCustomer = async (
   user: IUser
 ): Promise<Stripe.Customer | null> => {
-  if (!stripeInstance) stripeInstance = await initializeStripe();
-
+  let stripeInstance: Stripe | null = await initializeStripe();
   if (!stripeInstance) return null;
 
   const params: Stripe.CustomerCreateParams = {
@@ -39,11 +36,6 @@ export const createCustomer = async (
 export const assureStripeCustomerCreated = async (
   user: IUser
 ): Promise<IUser> => {
-  if (!stripeInstance) stripeInstance = await initializeStripe();
-
-  if (!stripeInstance)
-    throw new Error(AppErrorsMessages.INVALID_PAYMENT_INSTANCE);
-
   if (user.paymentId) {
     return user;
   }
@@ -62,8 +54,7 @@ export const assureStripeCustomerCreated = async (
 export const getSubsctriptionPaymentIntent = async (
   paymentIntentId: string
 ) => {
-  if (!stripeInstance) stripeInstance = await initializeStripe();
-
+  let stripeInstance: Stripe | null = await initializeStripe();
   if (!stripeInstance) return null;
 
   if (!paymentIntentId) {
@@ -84,8 +75,7 @@ export const createSubscriptionOnStripe = async (
   recurrency: "month" | "year",
   planType: PlansTypes
 ) => {
-  if (!stripeInstance) stripeInstance = await initializeStripe();
-
+  let stripeInstance: Stripe | null = await initializeStripe();
   if (!stripeInstance) return null;
 
   if (!paymentId) {
@@ -120,8 +110,7 @@ export const createSubscriptionOnStripe = async (
 };
 
 export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
-  if (!stripeInstance) stripeInstance = await initializeStripe();
-
+  let stripeInstance: Stripe | null = await initializeStripe();
   if (!stripeInstance) return null;
 
   const subscriptionUpdated = await SubscriptionsDB.findOneAndUpdate(
@@ -153,8 +142,7 @@ export const createSubscriptionSchedule = async (
   customerId: string,
   subscriptionId: string
 ) => {
-  if (!stripeInstance) stripeInstance = await initializeStripe();
-
+  let stripeInstance: Stripe | null = await initializeStripe();
   if (!stripeInstance) return null;
 
   return stripeInstance.subscriptionSchedules

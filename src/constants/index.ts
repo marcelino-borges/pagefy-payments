@@ -12,6 +12,7 @@ export enum AppErrorsMessages {
   SUBSCRIPTION_NOT_CANCELED = "Subscription not canceled.",
   PAYMENT_INTENT_NOT_FOUND = "Payment intent not found.",
   USER_HAS_NOT_SUBSCRIPTIONS = "User has no subscriptions.",
+  ERROR_ON_CONSTRUCT_EVENT = "Error constructing event.",
 }
 
 export const SYSTEM_EMAIL_CREDENTIALS = {
