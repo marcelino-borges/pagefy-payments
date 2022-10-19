@@ -144,7 +144,6 @@ export const createSubscriptionSchedule = async (subscriptionId: string) => {
 
   return stripeInstance.subscriptionSchedules
     .create({
-      start_date: Math.floor(new Date().getTime() / 1000),
       end_behavior: "cancel",
       from_subscription: subscriptionId,
     })
