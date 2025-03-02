@@ -16,7 +16,7 @@ export const runSwaggerAutogen = async (apiVersion: string) => {
       version: apiVersion,
       title: apiDescription.description,
     },
-    host: "http://socialbio-payments.onrender.com",
+    host: "http://pagefy-payments-api.onrender.com",
     basePath: "/",
     consumes: ["application/json"],
     definitions: {

@@ -1,11 +1,11 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "0.6.0",
+    "version": "0.6.1",
     "title": "REST API",
     "description": ""
   },
-  "host": "http://socialbio-payments.onrender.com",
+  "host": "http://pagefy-payments-api.onrender.com",
   "basePath": "/",
   "schemes": [
     "http"

@@ -21,7 +21,7 @@ export const sendEmailToUser = async (userRecipient: IEmailRecipient) => {
 
   return await transporter
     .sendMail({
-      from: `"Socialbio" <${NOREPLY_EMAIL}>`, // sender address
+      from: `"Pagefy" <${NOREPLY_EMAIL}>`, // sender address
       to: `"${name}" <${email}>`, // list of receivers
       subject: subject, // Subject line
       replyTo: email,

@@ -1,6 +1,6 @@
-# SocialBio Registration - Microservice
+# Pagefy Registration - Microservice
 
-### NodeJS
+## NodeJS
 
 - Typescript
 - Execute `npm start` to run locally

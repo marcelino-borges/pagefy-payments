@@ -49,7 +49,7 @@ export const handleInvoice = async (event: any) => {
               ${getHTMLFooterByLanguage(language)}
               `),
                 text: `
-              Olá, ${userFound.firstName}! A nota fiscal para a sua nova assinatura já está disponível! Você pode visualizar e baixar abrindo esse link no seu navegador: ${invoice.invoice_pdf}. Equipe Socialbio (https://www.socialbio.me)`,
+              Olá, ${userFound.firstName}! A nota fiscal para a sua nova assinatura já está disponível! Você pode visualizar e baixar abrindo esse link no seu navegador: ${invoice.invoice_pdf}. Equipe Pagefy (${process.env.APP_URL})`,
               };
             default:
               return {
@@ -69,7 +69,7 @@ export const handleInvoice = async (event: any) => {
               ${getHTMLFooterByLanguage(language)}
               `),
                 text: `
-              Hey ${userFound.firstName}! The invoice for your new subscription is available! You can view and download opening this link in your browser: ${invoice.invoice_pdf}. Socialbio Team (https://www.socialbio.me)`,
+              Hey ${userFound.firstName}! The invoice for your new subscription is available! You can view and download opening this link in your browser: ${invoice.invoice_pdf}. Pagefy Team (${process.env.APP_URL})`,
               };
           }
         };
@@ -79,7 +79,7 @@ export const handleInvoice = async (event: any) => {
         userRecipient = {
           name: userFound.firstName,
           email: userFound.email,
-          subject: `[Socialbio] ${dictionary.paymentSucceed}`,
+          subject: `[Pagefy] ${dictionary.paymentSucceed}`,
           messageHTML: getEmailMessageByLanguage(language).html,
           messagePlainText: getEmailMessageByLanguage(language).text,
         };

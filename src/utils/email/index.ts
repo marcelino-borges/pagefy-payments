@@ -1,13 +1,13 @@
 export const getHTMLFooterByLanguage = (language: string) => {
   switch (language) {
     case "pt":
-      return `Equipe Socialbio<br>
-      <a href="https://socialbio.me">https://www.socialbio.me</a><br>
-      <img src="https://firebasestorage.googleapis.com/v0/b/socialbio-41362.appspot.com/o/system%2Fimages%2Fbranding%2Flogo%2Fsocialbio-logo-whitebg-horizontal.jpg?alt=media&token=032a2436-2c7c-435e-acc0-7f3a420fd1d0" alt="Logo Socialbio" height="90px" />`;
+      return `Equipe Pagefy<br>
+      <a href="${process.env.APP_URL}">${process.env.APP_URL}</a><br>
+      <img src="${process.env.APP_LOGO_URL}" alt="Logo Pagefy" height="90px" />`;
     case "en":
-      return `Socialbio Team<br>
-        <a href="https://socialbio.me">https://www.socialbio.me</a><br>
-        <a href="https://socialbio.me"><img src="https://firebasestorage.googleapis.com/v0/b/socialbio-41362.appspot.com/o/system%2Fimages%2Fbranding%2Flogo%2Fsocialbio-logo-whitebg-horizontal.jpg?alt=media&token=032a2436-2c7c-435e-acc0-7f3a420fd1d0" alt="Logo Socialbio" height="90px" /></a><br>
+      return `Pagefy Team<br>
+        <a href="${process.env.APP_URL}">${process.env.APP_URL}</a><br>
+        <a href="${process.env.APP_URL}"><img src="${process.env.APP_LOGO_URL}" alt="Logo Pagefy" height="90px" /></a><br>
         `;
   }
 };

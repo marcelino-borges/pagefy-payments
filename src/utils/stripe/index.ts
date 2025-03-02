@@ -25,13 +25,13 @@ export const getPlanByPriceId = (priceId: string) => {
     priceId === process.env.STRIPE_PRICE_VIP_MONTH_ID ||
     priceId === process.env.STRIPE_PRICE_VIP_YEAR_ID
   )
-    return PlansTypes.VIP;
+    return PlansTypes.VIP.toString();
   else if (
     priceId === process.env.STRIPE_PRICE_PLATINUM_MONTH_ID ||
     priceId === process.env.STRIPE_PRICE_PLATINUM_YEAR_ID
   )
-    return PlansTypes.PLATINUM;
-  else return PlansTypes.FREE;
+    return PlansTypes.PLATINUM.toString();
+  else return PlansTypes.FREE.toString();
 };
 
 export const convertPaymentAmountToDecimalString = (int: number) => {

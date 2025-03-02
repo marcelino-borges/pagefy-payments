@@ -45,15 +45,17 @@ export const handleSubscriptionSchedule = async (event: any) => {
                 Infelizmente seu período de assinatura acabou!<br>
                 Você pode fazer outra a qualquer momento:<br>
                 <br>
-                ${getHTMLButton("https://socialbio.me", "CLIQUE AQUI")}<br>
+                ${getHTMLButton(process.env.APP_URL ?? "", "CLIQUE AQUI")}<br>
                 <br>
-                ou abrindo esse link no seu navegador: https://socialbio.me.<br>
+                ou abrindo esse link no seu navegador: ${
+                  process.env.APP_URL
+                }.<br>
                 <br>
                 <br>
-                Equipe Socialbio<br> 
+                Equipe Pagefy<br> 
                 `),
                 text: `
-                Olá, ${userFound.firstName}! Infelizmente seu período de assinatura acabou! Você pode fazer outra a qualquer momento através do https://socialbio.me. Equipe Socialbio.`,
+                Olá, ${userFound.firstName}! Infelizmente seu período de assinatura acabou! Você pode fazer outra a qualquer momento através do ${process.env.APP_URL}. Equipe Pagefy.`,
               };
             default:
               return {
@@ -63,15 +65,15 @@ export const handleSubscriptionSchedule = async (event: any) => {
                 Unfortunately your subscription is over!<br>
                 You can make another one anytime:<br>
                 <br>
-                ${getHTMLButton("https://socialbio.me", "CLICK HERE")}<br>
+                ${getHTMLButton("${process.env.APP_URL}", "CLICK HERE")}<br>
                 <br>
-                or open this link your browser: https://socialbio.me.<br>
+                or open this link your browser: ${process.env.APP_URL}.<br>
                 <br>
                 <br>
-                Socialbio Team<br>  
+                Pagefy Team<br>  
                 `,
                 text: `
-                Hey ${userFound.firstName}! Unfortunately your subscription is over! You can make another one anytime at https://socialbio.me. Socialbio Team`,
+                Hey ${userFound.firstName}! Unfortunately your subscription is over! You can make another one anytime at ${process.env.APP_URL}. Pagefy Team`,
               };
           }
         };
@@ -79,7 +81,7 @@ export const handleSubscriptionSchedule = async (event: any) => {
         userRecipient = {
           name: userFound.firstName,
           email: userFound.email,
-          subject: `[Socialbio] ${dictionary.payment}`,
+          subject: `[Pagefy] ${dictionary.payment}`,
           messageHTML: getEmailMessageByLanguage(language).html,
           messagePlainText: getEmailMessageByLanguage(language).text,
         };
@@ -96,15 +98,17 @@ export const handleSubscriptionSchedule = async (event: any) => {
                 Sua assinatura acaba daqui a 7 dias.<br>
                 Você pode fazer outra a qualquer momento:<br>
                 <br>
-                ${getHTMLButton("https://socialbio.me", "CLIQUE AQUI")}<br>
+                ${getHTMLButton("${process.env.APP_URL}", "CLIQUE AQUI")}<br>
                 <br>
-                ou abrindo esse link no seu navegador: https://socialbio.me.<br>
+                ou abrindo esse link no seu navegador: ${
+                  process.env.APP_URL
+                }.<br>
                 <br>
                 <br>
-                Equipe Socialbio<br> 
+                Equipe Pagefy<br> 
                 `),
                 text: `
-                Olá, ${userFound.firstName}! Sua assinatura acaba daqui a 7 dias. Você pode fazer outra a qualquer momento através do https://socialbio.me. Equipe Socialbio.`,
+                Olá, ${userFound.firstName}! Sua assinatura acaba daqui a 7 dias. Você pode fazer outra a qualquer momento através do ${process.env.APP_URL}. Equipe Pagefy.`,
               };
             default:
               return {
@@ -114,15 +118,15 @@ export const handleSubscriptionSchedule = async (event: any) => {
                 Unfortunately your subscription will end in 7 days.<br>
                 You can make another one anytime:<br>
                 <br>
-                ${getHTMLButton("https://socialbio.me", "CLICK HERE")}<br>
+                ${getHTMLButton(process.env.APP_URL ?? "", "CLICK HERE")}<br>
                 <br>
-                or open this link your browser: https://socialbio.me.<br>
+                or open this link your browser: ${process.env.APP_URL}.<br>
                 <br>
                 <br>
-                Socialbio Team<br>  
+                Pagefy Team<br>  
                 `,
                 text: `
-                Hey ${userFound.firstName}! Unfortunately your subscription will end in 7 days. You can make another one anytime at https://socialbio.me. Socialbio Team`,
+                Hey ${userFound.firstName}! Unfortunately your subscription will end in 7 days. You can make another one anytime at ${process.env.APP_URL}. Pagefy Team`,
               };
           }
         };
@@ -130,7 +134,7 @@ export const handleSubscriptionSchedule = async (event: any) => {
         userRecipient = {
           name: userFound.firstName,
           email: userFound.email,
-          subject: `[Socialbio] ${dictionary.payment}`,
+          subject: `[Pagefy] ${dictionary.payment}`,
           messageHTML: getEmailMessageByLanguage(language).html,
           messagePlainText: getEmailMessageByLanguage(language).text,
         };

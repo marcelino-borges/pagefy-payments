@@ -58,15 +58,17 @@ export const handlePaymentIntent = async (event: any) => {
                   Desculpe! Seu pagamento falhou!<br>
                   Por favor tente fazer sua assinatura novamente<br>
                   <br>
-                  ${getHTMLButton("https://socialbio.me", "CLIQUE AQUI")}<br>
+                  ${getHTMLButton(process.env.APP_URL ?? "", "CLIQUE AQUI")}<br>
                   <br>
-                  ou abra esse link no seu navegador: https://socialbio.me.<br>
+                  ou abra esse link no seu navegador: ${
+                    process.env.APP_URL
+                  }.<br>
                   <br>
                   <br>
                   ${getHTMLFooterByLanguage(language)}
                   `),
                   text: `
-                  Olá, ${userFound.firstName}! Desculpe! Seu pagamento falhou! Por favor tente fazer sua assinatura novamente no https://socialbio.me. Equipe Socialbio`,
+                  Olá, ${userFound.firstName}! Desculpe! Seu pagamento falhou! Por favor tente fazer sua assinatura novamente no ${process.env.APP_URL}. Equipe Pagefy`,
                 };
               default:
                 return {
@@ -76,15 +78,15 @@ export const handlePaymentIntent = async (event: any) => {
                   Sorry, your payment failed!<br>
                   Please try to subscribe again.<br>
                   <br>
-                  ${getHTMLButton("https://socialbio.me", "CLICK HERE")}<br>
+                  ${getHTMLButton(process.env.APP_URL ?? "", "CLICK HERE")}<br>
                   <br>
-                  or open this link your browser: https://socialbio.me.
+                  or open this link your browser: ${process.env.APP_URL}.
                   <br>
                   <br>
                   ${getHTMLFooterByLanguage(language)}
                   `,
                   text: `
-                  Hey ${userFound.firstName}! Sorry, your payment failed! Please try to subscribe again. Try again opening this link in your browser: https://socialbio.me. Socialbio Team`,
+                  Hey ${userFound.firstName}! Sorry, your payment failed! Please try to subscribe again. Try again opening this link in your browser: ${process.env.APP_URL}. Pagefy Team`,
                 };
             }
           };
@@ -92,7 +94,7 @@ export const handlePaymentIntent = async (event: any) => {
           userRecipient = {
             name: userFound.firstName,
             email: userFound.email,
-            subject: `[Socialbio] ${dictionary.payment}`,
+            subject: `[Pagefy] ${dictionary.payment}`,
             messageHTML: getEmailMessageByLanguage(language).html,
             messagePlainText: getEmailMessageByLanguage(language).text,
           };
@@ -133,10 +135,9 @@ export const handlePaymentIntent = async (event: any) => {
               <br>
               <br>
               ${getHTMLFooterByLanguage(language)}
-              <a href="https://socialbio.me">https://www.socialbio.me</a>   
               `),
                   text: `
-              Olá, ${userFound.firstName}! Parabéns, seu pagamento foi finalizado com sucesso! Agora você é um assinante ${plan}! Bem-vindo a bordo! Equipe Socialbio (https://www.socialbio.me)
+              Olá, ${userFound.firstName}! Parabéns, seu pagamento foi finalizado com sucesso! Agora você é um assinante ${plan}! Bem-vindo a bordo! Equipe Pagefy (${process.env.APP_URL})
               `,
                 };
               default:
@@ -152,14 +153,15 @@ export const handlePaymentIntent = async (event: any) => {
               <br>
               <br>
               ${getHTMLFooterByLanguage(language)}
-              <a href="https://socialbio.me">https://www.socialbio.me</a>   
               `),
                   text: `
               Hey ${
                 userFound.firstName
               }! Congratulations, your payment was finished with success! You are now a ${getPlanByPriceId(
                     updatedSubscription.priceId
-                  )} subscriber! Welcome onboard! Socialbio Team (https://www.socialbio.me)
+                  )} subscriber! Welcome onboard! Pagefy Team (${
+                    process.env.APP_URL
+                  })
               `,
                 };
             }
@@ -168,7 +170,7 @@ export const handlePaymentIntent = async (event: any) => {
           userRecipient = {
             name: userFound.firstName,
             email: userFound.email,
-            subject: `[Socialbio] ${dictionary.paymentSucceed}`,
+            subject: `[Pagefy] ${dictionary.paymentSucceed}`,
             messageHTML: getEmailMessageByLanguage(language).html,
             messagePlainText: getEmailMessageByLanguage(language).text,
           };
@@ -177,7 +179,7 @@ export const handlePaymentIntent = async (event: any) => {
             const systemRecipient: IEmailRecipient = {
               name: "System",
               email: SYSTEM_EMAIL_CREDENTIALS.user,
-              subject: `[Socialbio] ${dictionary.payment}`,
+              subject: `[Pagefy] ${dictionary.payment}`,
               messageHTML: getHTMLBody(`
               <b>Hey Team!</b><br>
               <br>
@@ -185,12 +187,12 @@ export const handlePaymentIntent = async (event: any) => {
                 userFound.email
               }) has just paid for a ${plan} subscription of ${amount} (${currency.toUpperCase()})
                 <br>
-              Socialbio System<br>  
+              Pagefy System<br>  
               `),
               messagePlainText: `
               Hey Team! User ${userFound.firstName} (${
                 userFound.email
-              }) has just paid for a ${plan} subscription of ${amount} (${currency.toUpperCase()}). Socialbio System`,
+              }) has just paid for a ${plan} subscription of ${amount} (${currency.toUpperCase()}). Pagefy System`,
             };
             sendEmailToUser(systemRecipient);
           }
