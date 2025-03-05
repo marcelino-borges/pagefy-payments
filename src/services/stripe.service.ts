@@ -9,6 +9,7 @@ import log from "../utils/logs";
 import stripe from "../config/stripe";
 import { AppError } from "../utils/app-error";
 import { HttpStatusCode } from "axios";
+import { CheckoutSession } from "../models/checkout.models";
 
 export const getAllPlans = async () => {
   if (!stripe) return null;
@@ -107,11 +108,23 @@ export const createCheckoutSession = async (priceId: string) => {
         quantity: 1,
       },
     ],
-    success_url: `${appUrl}/checkout/success`,
-    cancel_url: `${appUrl}/checkout/cancel`,
+    success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${appUrl}/checkout/cancel?session_id={CHECKOUT_SESSION_ID}`,
   });
 
-  return newSession;
+  return newSession as CheckoutSession;
+};
+
+export const getCheckoutSessionById = async (sessionId: string) => {
+  if (!stripe)
+    throw new AppError(
+      AppErrorsMessages.INTERNAL_ERROR,
+      HttpStatusCode.InternalServerError
+    );
+
+  const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+  return session as CheckoutSession;
 };
 
 export const createCustomer = async (

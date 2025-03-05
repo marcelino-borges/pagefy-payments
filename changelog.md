@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.9.0] - 2025-03-05
+
+- Feat: new endpoint to retrieve a Stripe's checkout session by ID
+
 ### [0.8.0] - 2025-03-05
 
 - Feat: new endpoint to create a new Stripe's checkout session

@@ -14,6 +14,7 @@ export enum AppErrorsMessages {
   USER_HAS_NOT_SUBSCRIPTIONS = "User has no subscriptions.",
   ERROR_ON_CONSTRUCT_EVENT = "Error constructing event.",
   PRICE_ID_REQUIRED = "PriceId required.",
+  SESSION_ID_REQUIRED = "SessionId required.",
 }
 
 export const SYSTEM_EMAIL_CREDENTIALS = {

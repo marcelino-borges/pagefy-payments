@@ -90,6 +90,50 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
   }
 };
 
+export const getCheckoutSessionById = async (req: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Checkout']
+    #swagger.summary = 'Gets a checkout session by ID'
+    #swagger.description  = 'Gets a checkout session by ID'
+    #swagger.parameters['sessionId'] = {
+      in: 'params',
+      description: 'ID of the checkout session in Stripe',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      schema: { $ref: "#/definitions/Checkout" },
+      description: 'New Stripe session'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+
+  const { sessionId } = req.params;
+
+  if (!sessionId?.length) {
+    throw new AppError(AppErrorsMessages.SESSION_ID_REQUIRED);
+  }
+
+  try {
+    const newSession = await stripeService.getCheckoutSessionById(sessionId);
+
+    res.status(200).json(newSession);
+  } catch (error: any) {
+    log.error("[StripeController.getCheckoutSessionById] EXCEPTION: ", error);
+
+    const result = AppResult.fromError(error);
+
+    res.status(result.statusCode).json(result);
+  }
+};
+
 export const createSubsctription = async (req: Request, res: Response) => {
   /* 
     #swagger.tags = ['Subscription']

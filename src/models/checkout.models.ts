@@ -30,7 +30,7 @@ interface TotalDetails {
   amount_tax: number;
 }
 
-interface CheckoutSession {
+export interface CheckoutSession {
   id: string;
   object: string;
   adaptive_pricing: string | null;
