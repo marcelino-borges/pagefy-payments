@@ -11,6 +11,7 @@ router.use(express.json());
  */
 
 // Private routes
+router.get("/plans", verifyToken, stripeController.getPlans);
 router.post("/subscription", verifyToken, stripeController.createSubsctription);
 router.put(
   "/subscription/cancel/:subscriptionId",

@@ -1,20 +1,95 @@
 import Stripe from "stripe";
-import { initializeStripe } from "../config/stripe";
 import { AppErrorsMessages } from "../constants";
 import { IUser, PlansTypes } from "../models/user.models";
 import SubscriptionsDB, {
-  IPaymentIntent,
-  ISubscriptionCreationResult,
   SubscriptionStatus,
 } from "../models/subscription.models";
 import { getPriceIdByRecurrencyAndPlanType } from "../utils/stripe";
 import log from "../utils/logs";
+import stripe from "../config/stripe";
+
+export const getAllPlans = async () => {
+  if (!stripe) return null;
+
+  const products = await stripe.products.list({ active: true });
+
+  const pagefyProducts = products.data.filter(
+    (product) =>
+      product.statement_descriptor?.toLowerCase().includes("pagefy_sub") &&
+      product.default_price
+  );
+
+  const withFilledPrices = [];
+
+  for (const product of pagefyProducts) {
+    const productPrices = await stripe.prices.list({
+      active: true,
+      product: product.id,
+    });
+
+    const {
+      // removed props
+      package_dimensions,
+      shippable,
+      unit_label,
+      livemode,
+      attributes,
+      object,
+      active,
+      marketing_features,
+      statement_descriptor,
+      tax_code,
+      type,
+      // adapted props
+      name,
+      metadata,
+      updated,
+      created,
+      ...withoutMetadata
+    } = product as any;
+
+    const features = {
+      pt: metadata.features_pt.split(";"),
+      en: metadata.features_en.split(";"),
+    };
+
+    withFilledPrices.push({
+      ...withoutMetadata,
+      features,
+      created_at: new Date(created * 1000),
+      updated_at: new Date(updated * 1000),
+      name: name.replace("Pagefy ", ""),
+      prices: productPrices.data.map(
+        ({
+          // removed props
+          livemode,
+          billing_scheme,
+          object,
+          active,
+          custom_unit_amount,
+          metadata,
+          nickname,
+          tax_behavior,
+          tiers_mode,
+          transform_quantity,
+          // adapted props
+          created,
+          ...price
+        }) => ({
+          ...price,
+          created_at: new Date(created * 1000),
+        })
+      ),
+    });
+  }
+
+  return withFilledPrices;
+};
 
 export const createCustomer = async (
   user: IUser
 ): Promise<Stripe.Customer | null> => {
-  let stripeInstance: Stripe | null = await initializeStripe();
-  if (!stripeInstance) return null;
+  if (!stripe) return null;
 
   const params: Stripe.CustomerCreateParams = {
     email: user.email,
@@ -25,9 +100,7 @@ export const createCustomer = async (
     },
   };
 
-  const customer: Stripe.Customer = await stripeInstance.customers.create(
-    params
-  );
+  const customer: Stripe.Customer = await stripe.customers.create(params);
 
   if (customer) return customer;
   return null;
@@ -54,14 +127,13 @@ export const assureStripeCustomerCreated = async (
 export const getSubsctriptionPaymentIntent = async (
   paymentIntentId: string
 ) => {
-  let stripeInstance: Stripe | null = await initializeStripe();
-  if (!stripeInstance) return null;
+  if (!stripe) return null;
 
   if (!paymentIntentId) {
     return null;
   }
 
-  const paymentIntent = stripeInstance.paymentIntents.retrieve(paymentIntentId);
+  const paymentIntent = stripe.paymentIntents.retrieve(paymentIntentId);
 
   if (!paymentIntent) {
     return null;
@@ -75,8 +147,7 @@ export const createSubscriptionOnStripe = async (
   recurrency: "month" | "year",
   planType: PlansTypes
 ) => {
-  let stripeInstance: Stripe | null = await initializeStripe();
-  if (!stripeInstance) return null;
+  if (!stripe) return null;
 
   if (!paymentId) {
     return null;
@@ -88,7 +159,7 @@ export const createSubscriptionOnStripe = async (
     return null;
   }
 
-  const subscription = stripeInstance.subscriptions.create({
+  const subscription = stripe.subscriptions.create({
     customer: paymentId,
     items: [
       {
@@ -110,8 +181,7 @@ export const createSubscriptionOnStripe = async (
 };
 
 export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
-  let stripeInstance: Stripe | null = await initializeStripe();
-  if (!stripeInstance) return null;
+  if (!stripe) return null;
 
   const subscriptionUpdated = await SubscriptionsDB.findOneAndUpdate(
     {
@@ -129,7 +199,7 @@ export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
     return null;
   }
 
-  const subscription = stripeInstance.subscriptions.del(subscriptionId);
+  const subscription = stripe.subscriptions.del(subscriptionId);
 
   if (!subscription) {
     return null;
@@ -139,10 +209,9 @@ export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
 };
 
 export const createSubscriptionSchedule = async (subscriptionId: string) => {
-  let stripeInstance: Stripe | null = await initializeStripe();
-  if (!stripeInstance) return null;
+  if (!stripe) return null;
 
-  return stripeInstance.subscriptionSchedules
+  return stripe.subscriptionSchedules
     .create({
       from_subscription: subscriptionId,
     })

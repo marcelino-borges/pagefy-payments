@@ -1,8 +1,9 @@
 import Stripe from "stripe";
 import log from "../utils/logs";
 
-export const initializeStripe = async () => {
+const initializeStripe = () => {
   let stripe: Stripe | null = null;
+
   try {
     if (process.env.STRIPE_SECRET_KEY) {
       stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
@@ -21,3 +22,7 @@ export const initializeStripe = async () => {
     return stripe;
   }
 };
+
+const stripe = initializeStripe();
+
+export default stripe;

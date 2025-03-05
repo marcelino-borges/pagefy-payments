@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.7.0] - 2025-03-05
+
+- Feat: endpoint to retrieve Stripe plans
+
 ### [0.6.1] - 2022-10-19
 
 - Fix: Webhook fix to return from controller

@@ -14,6 +14,37 @@ import { updateUser } from "./../services/user.service";
 import * as stripeWebhooks from "../services/webhooks";
 import * as subscriptionsResultsService from "./../services/subscriptions-results.service";
 
+export const getPlans = async (_: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Plans']
+    #swagger.summary = 'Gets all plans'
+    #swagger.description  = 'Gets all plans'
+    #swagger.responses[200] = {
+      schema: { $ref: "#/definitions/Plans" },
+      description: 'List of plans with its prices'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+
+  try {
+    const products: any = await stripeService.getAllPlans();
+
+    return res.status(200).json(products);
+  } catch (e: any) {
+    log.error("[StripeController.getPlans] EXCEPTION: ", e);
+    return res
+      .status(500)
+      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
+  }
+};
+
 export const createSubsctription = async (req: Request, res: Response) => {
   /* 
     #swagger.tags = ['Subscription']

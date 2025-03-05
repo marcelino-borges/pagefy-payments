@@ -1,15 +1,13 @@
-import { initializeStripe } from "../../config/stripe";
 import { Request, Response } from "express";
 import AppResult from "../../errors/app-error";
 import { AppErrorsMessages } from "../../constants";
 import log from "../../utils/logs";
 import { handlePaymentIntent } from "./payment-intent.service";
 import { handleInvoice } from "./invoice.service";
-import Stripe from "stripe";
+import stripe from "../../config/stripe";
 
 export const hookEventsFromStripe = async (req: Request, res: Response) => {
-  let stripeInstance: Stripe | null = await initializeStripe();
-  if (!stripeInstance) {
+  if (!stripe) {
     log.error(
       "[webhooks/index:hookEventsFromStripe] Error: ",
       "Stripe instance not initialized."
@@ -28,7 +26,7 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
   let event;
 
   try {
-    event = stripeInstance.webhooks.constructEvent(
+    event = stripe.webhooks.constructEvent(
       req.body,
       req.headers["stripe-signature"] as any,
       webhookSecret
@@ -39,6 +37,7 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
       .status(500)
       .json(new AppResult(`Webhook Error`, error.message, 500));
   }
+
   if (!event)
     return res
       .status(500)
@@ -51,6 +50,7 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
       );
 
   console.log("🔔 Received event " + event.type);
+
   if (event.type.includes("payment_intent")) {
     handlePaymentIntent(event);
   } else if (event.type.includes("invoice")) {

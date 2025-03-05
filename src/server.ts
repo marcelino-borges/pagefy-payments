@@ -8,7 +8,6 @@ import admin from "firebase-admin";
 import swaggerFile from "../swagger_output.json";
 import swaggerUi from "swagger-ui-express";
 import connectMongo from "./config/mongo";
-import { initializeStripe } from "./config/stripe";
 import firebaseConfig from "./config/firebase";
 import log from "./utils/logs";
 
@@ -32,8 +31,6 @@ if (canReadEnv) {
 
   console.log("PORT on env: ", PORT);
 
-  initializeStripe();
-
   const app = express();
 
   const publicCors = cors();
@@ -43,12 +40,12 @@ if (canReadEnv) {
       app.use(publicCors);
       app.use(helmet());
       app.options("*", publicCors);
-      app.use("/health-check", publicCors, (_, res) =>
-        res.status(200).json({ message: "API running." })
-      );
+      app.use("/health-check", publicCors, (_, res) => {
+        res.status(200).json({ message: "API running." });
+      });
       app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
       app.use("/api/v1/webhooks", routesWebhooks);
-      app.use("/api/v1/client", routesClient);
+      app.use("/api/v1", routesClient);
 
       const server = app.listen(PORT, () => {
         console.log(`Listening on port ${PORT}`);
