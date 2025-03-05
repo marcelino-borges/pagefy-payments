@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "0.6.1",
+    "version": "0.7.1",
     "title": "REST API",
     "description": ""
   },
@@ -21,25 +21,19 @@
         ],
         "summary": "Gets all plans",
         "description": "Gets all plans",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
-            "description": "Subscription created"
+            "description": "List of plans with its prices",
+            "schema": {
+              "$ref": "#/definitions/Plans"
+            }
           },
           "400": {
             "schema": {
               "$ref": "#/definitions/Error"
             },
             "description": "Message of error"
-          },
-          "401": {
-            "description": "Unauthorized"
           },
           "500": {
             "description": "Message of error",
@@ -341,6 +335,267 @@
         "message": {
           "type": "string",
           "example": "Summary of the result"
+        }
+      }
+    },
+    "Plan": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "prod_1234"
+        },
+        "default_price": {
+          "type": "string",
+          "example": "price_1234"
+        },
+        "description": {
+          "type": "string",
+          "example": "Pagefy Bla Subscription"
+        },
+        "features": {
+          "type": "object",
+          "properties": {
+            "pt": {
+              "type": "array",
+              "example": [
+                "Funcionalidade 1",
+                "Funcionalidade 2"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "en": {
+              "type": "array",
+              "example": [
+                "Feature 1",
+                "Feature 2"
+              ],
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "images": {
+          "type": "array",
+          "example": [
+            "https://files.stripe.com/links/1234"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "url": {},
+        "prices": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "example": "price_1234"
+              },
+              "object": {
+                "type": "string",
+                "example": "price"
+              },
+              "created_at": {
+                "type": "string",
+                "example": "2025-03-04T20:21:23.000Z"
+              },
+              "currency": {
+                "type": "string",
+                "example": "brl"
+              },
+              "lookup_key": {
+                "type": "string",
+                "example": "pagefy_sub_bla_month"
+              },
+              "nickname": {},
+              "product": {
+                "type": "string",
+                "example": "prod_1234"
+              },
+              "recurring": {
+                "type": "object",
+                "properties": {
+                  "aggregate_usage": {},
+                  "interval": {
+                    "type": "string",
+                    "example": "month"
+                  },
+                  "interval_count": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "meter": {},
+                  "trial_period_days": {},
+                  "usage_type": {
+                    "type": "string",
+                    "example": "licensed"
+                  }
+                }
+              },
+              "type": {
+                "type": "string",
+                "example": "recurring"
+              },
+              "unit_amount": {
+                "type": "number",
+                "example": 3990
+              },
+              "unit_amount_decimal": {
+                "type": "string",
+                "example": "3990"
+              }
+            }
+          }
+        },
+        "created_at": {
+          "type": "string",
+          "example": "2025-03-04T20:21:23.000Z"
+        },
+        "updated_at": {
+          "type": "string",
+          "example": "2025-03-04T20:33:32.000Z"
+        },
+        "name": {
+          "type": "string",
+          "example": "Boost"
+        }
+      }
+    },
+    "Plans": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "prod_1234"
+          },
+          "default_price": {
+            "type": "string",
+            "example": "price_1234"
+          },
+          "description": {
+            "type": "string",
+            "example": "Pagefy Bla Subscription"
+          },
+          "features": {
+            "type": "object",
+            "properties": {
+              "pt": {
+                "type": "array",
+                "example": [
+                  "Funcionalidade 1",
+                  "Funcionalidade 2"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              },
+              "en": {
+                "type": "array",
+                "example": [
+                  "Feature 1",
+                  "Feature 2"
+                ],
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "images": {
+            "type": "array",
+            "example": [
+              "https://files.stripe.com/links/1234"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "url": {},
+          "prices": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "example": "price_1234"
+                },
+                "object": {
+                  "type": "string",
+                  "example": "price"
+                },
+                "created_at": {
+                  "type": "string",
+                  "example": "2025-03-04T20:21:23.000Z"
+                },
+                "currency": {
+                  "type": "string",
+                  "example": "brl"
+                },
+                "lookup_key": {
+                  "type": "string",
+                  "example": "pagefy_sub_bla_month"
+                },
+                "nickname": {},
+                "product": {
+                  "type": "string",
+                  "example": "prod_1234"
+                },
+                "recurring": {
+                  "type": "object",
+                  "properties": {
+                    "aggregate_usage": {},
+                    "interval": {
+                      "type": "string",
+                      "example": "month"
+                    },
+                    "interval_count": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "meter": {},
+                    "trial_period_days": {},
+                    "usage_type": {
+                      "type": "string",
+                      "example": "licensed"
+                    }
+                  }
+                },
+                "type": {
+                  "type": "string",
+                  "example": "recurring"
+                },
+                "unit_amount": {
+                  "type": "number",
+                  "example": 3990
+                },
+                "unit_amount_decimal": {
+                  "type": "string",
+                  "example": "3990"
+                }
+              }
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "example": "2025-03-04T20:21:23.000Z"
+          },
+          "updated_at": {
+            "type": "string",
+            "example": "2025-03-04T20:33:32.000Z"
+          },
+          "name": {
+            "type": "string",
+            "example": "Boost"
+          }
         }
       }
     }
