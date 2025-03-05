@@ -4,7 +4,7 @@
   "description": "",
   "main": "src/server.js",
   "scripts": {
-    "start": "nodemon -x ts-node src/server.ts",
+    "start": "env-cmd -f ./.env npx tsx src/server.ts",
     "start_dev": "env-cmd -f ./.env.dev nodemon -x ts-node src/server.ts",
     "swagger-autogen": "ts-node ./src/config/swagger.ts",
     "update-pkg-version": "ts-node ./src/config/package-json.ts && prettier --write ./package.json",
