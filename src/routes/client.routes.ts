@@ -16,7 +16,10 @@ router.post("/checkout", stripeController.createCheckoutSession);
 
 // Private routes
 
-router.get("/checkout/:sessionId", stripeController.getCheckoutSessionById);
+router.get(
+  "/checkout/session/:sessionId",
+  stripeController.getCheckoutSessionById
+);
 router.post("/subscription", verifyToken, stripeController.createSubsctription);
 router.put(
   "/subscription/cancel/:subscriptionId",
