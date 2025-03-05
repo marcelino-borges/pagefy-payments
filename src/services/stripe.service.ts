@@ -7,6 +7,8 @@ import SubscriptionsDB, {
 import { getPriceIdByRecurrencyAndPlanType } from "../utils/stripe";
 import log from "../utils/logs";
 import stripe from "../config/stripe";
+import { AppError } from "../utils/app-error";
+import { HttpStatusCode } from "axios";
 
 export const getAllPlans = async () => {
   if (!stripe) return null;
@@ -84,6 +86,32 @@ export const getAllPlans = async () => {
   }
 
   return withFilledPrices;
+};
+
+export const createCheckoutSession = async (priceId: string) => {
+  const appUrl = process.env.APP_URL;
+
+  if (!stripe || !process.env.APP_URL)
+    throw new AppError(
+      AppErrorsMessages.INTERNAL_ERROR,
+      HttpStatusCode.InternalServerError
+    );
+
+  const newSession = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    ui_mode: "hosted",
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price: priceId,
+        quantity: 1,
+      },
+    ],
+    success_url: `${appUrl}/checkout/success`,
+    cancel_url: `${appUrl}/checkout/cancel`,
+  });
+
+  return newSession;
 };
 
 export const createCustomer = async (
@@ -199,7 +227,7 @@ export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
     return null;
   }
 
-  const subscription = stripe.subscriptions.del(subscriptionId);
+  const subscription = stripe.subscriptions.cancel(subscriptionId);
 
   if (!subscription) {
     return null;

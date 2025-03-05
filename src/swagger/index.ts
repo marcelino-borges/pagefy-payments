@@ -1,5 +1,5 @@
 import { getPackageJson } from "../config/package-json";
-import { userModel, errorModel, planModel } from "./models";
+import { userModel, errorModel, planModel, checkoutModel } from "./models";
 
 import swaggerAutogen from "swagger-autogen";
 
@@ -24,6 +24,7 @@ export const runSwaggerAutogen = async (apiVersion: string) => {
       Error: errorModel,
       Plan: planModel,
       Plans: [planModel],
+      Checkout: checkoutModel,
     },
   };
 

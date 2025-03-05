@@ -10,7 +10,7 @@ const initializeStripe = () => {
         appInfo: {
           name: "Pagefy",
         },
-        apiVersion: "2022-08-01",
+        apiVersion: "2025-02-24.acacia",
         typescript: true,
       });
     } else {

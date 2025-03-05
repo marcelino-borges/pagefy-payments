@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.8.0] - 2025-03-05
+
+- Feat: new endpoint to create a new Stripe's checkout session
+
 ### [0.7.1] - 2025-03-05
 
 - Fix: removed auth from endpoint to retrieve Stripe plans

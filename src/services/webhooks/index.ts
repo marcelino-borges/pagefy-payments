@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import AppResult from "../../errors/app-error";
+import AppResult from "../../utils/app-result";
 import { AppErrorsMessages } from "../../constants";
 import log from "../../utils/logs";
 import { handlePaymentIntent } from "./payment-intent.service";

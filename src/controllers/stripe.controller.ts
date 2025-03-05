@@ -5,7 +5,7 @@ import SubscriptionsDB, {
 import * as userService from "../services/user.service";
 import * as stripeService from "../services/stripe.service";
 import { Request, Response } from "express";
-import AppResult from "../errors/app-error";
+import AppResult from "../utils/app-result";
 import { AppErrorsMessages } from "../constants";
 import log from "../utils/logs";
 import Stripe from "stripe";
@@ -13,6 +13,7 @@ import { IUser } from "./../models/user.models";
 import { updateUser } from "./../services/user.service";
 import * as stripeWebhooks from "../services/webhooks";
 import * as subscriptionsResultsService from "./../services/subscriptions-results.service";
+import { AppError } from "../utils/app-error";
 
 export const getPlans = async (_: Request, res: Response) => {
   /* 
@@ -36,12 +37,56 @@ export const getPlans = async (_: Request, res: Response) => {
   try {
     const products: any = await stripeService.getAllPlans();
 
-    return res.status(200).json(products);
+    res.status(200).json(products);
   } catch (e: any) {
     log.error("[StripeController.getPlans] EXCEPTION: ", e);
-    return res
+    res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
+  }
+};
+
+export const createCheckoutSession = async (req: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Checkout']
+    #swagger.summary = 'Creates a new checkout session'
+    #swagger.description  = 'Creates a new checkout session'
+    #swagger.parameters['priceId'] = {
+      in: 'body',
+      description: 'ID of the price in Stripe',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      schema: { $ref: "#/definitions/Checkout" },
+      description: 'New Stripe session'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+
+  const { priceId } = req.body;
+
+  if (!priceId?.length) {
+    throw new AppError(AppErrorsMessages.PRICE_ID_REQUIRED);
+  }
+
+  try {
+    const newSession = await stripeService.createCheckoutSession(priceId);
+
+    res.status(200).json(newSession);
+  } catch (error: any) {
+    log.error("[StripeController.createCheckoutSession] EXCEPTION: ", error);
+
+    const result = AppResult.fromError(error);
+
+    res.status(result.statusCode).json(result);
   }
 };
 
@@ -88,9 +133,10 @@ export const createSubsctription = async (req: Request, res: Response) => {
   }: ICreateSubscriptionProps = req.body as ICreateSubscriptionProps;
 
   if (!currency || !recurrency || !planType) {
-    return res
+    res
       .status(400)
       .json(new AppResult(AppErrorsMessages.MISSING_PROPS, null, 400));
+    return;
   }
 
   try {
@@ -99,9 +145,10 @@ export const createSubsctription = async (req: Request, res: Response) => {
     );
 
     if (!userFound) {
-      return res
+      res
         .status(400)
         .json(new AppResult(AppErrorsMessages.USER_NOT_FOUND, null, 400));
+      return;
     }
 
     const userWithPaymentId: IUser =
@@ -128,11 +175,12 @@ export const createSubsctription = async (req: Request, res: Response) => {
       );
 
     if (!subscription) {
-      return res
+      res
         .status(400)
         .json(
           new AppResult(AppErrorsMessages.SUBSCRIPTION_NOT_CREATED, null, 400)
         );
+      return;
     }
 
     const invoice = subscription.latest_invoice as Stripe.Invoice;
@@ -167,18 +215,19 @@ export const createSubsctription = async (req: Request, res: Response) => {
       );
 
     if (!subscriptionSaved) {
-      return res
+      res
         .status(400)
         .json(
           new AppResult(AppErrorsMessages.SUBSCRIPTION_NOT_CREATED, null, 400)
         );
+      return;
     }
 
     subscriptionSaved.latestInvoice.payment_intent.client_secret = clientSecret;
-    return res.status(201).json(subscriptionSaved);
+    res.status(201).json(subscriptionSaved);
   } catch (e: any) {
     log.error("[StripeController.createSubsctription] EXCEPTION: ", e);
-    return res
+    res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
   }
@@ -210,9 +259,10 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
   const { subscriptionId } = req.params;
 
   if (!subscriptionId) {
-    return res
+    res
       .status(400)
       .json(new AppResult(AppErrorsMessages.MISSING_PROPS, null, 400));
+    return;
   }
 
   try {
@@ -220,17 +270,18 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
       await stripeService.cancelSubscriptionOnStripe(subscriptionId);
 
     if (!subscriptionCanceled) {
-      return res
+      res
         .status(400)
         .json(
           new AppResult(AppErrorsMessages.SUBSCRIPTION_NOT_CANCELED, null, 400)
         );
+      return;
     }
 
-    return res.status(200).json(subscriptionCanceled);
+    res.status(200).json(subscriptionCanceled);
   } catch (e: any) {
     log.error("[StripeController.cancelSubsctription] EXCEPTION: ", e);
-    return res
+    res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
   }
@@ -265,9 +316,10 @@ export const getSubsctriptionPaymentIntent = async (
   const { paymentIntentId } = req.params;
 
   if (!paymentIntentId) {
-    return res
+    res
       .status(400)
       .json(new AppResult(AppErrorsMessages.MISSING_PROPS, null, 400));
+    return;
   }
 
   try {
@@ -276,20 +328,21 @@ export const getSubsctriptionPaymentIntent = async (
     );
 
     if (!paymentIntent) {
-      return res
+      res
         .status(400)
         .json(
           new AppResult(AppErrorsMessages.PAYMENT_INTENT_NOT_FOUND, null, 400)
         );
+      return;
     }
 
-    return res.status(200).json(paymentIntent);
+    res.status(200).json(paymentIntent);
   } catch (e: any) {
     log.error(
       "[StripeController.getSubsctriptionPaymentIntent] EXCEPTION: ",
       e
     );
-    return res
+    res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
   }
@@ -321,9 +374,10 @@ export const getUserSubsctriptions = async (req: Request, res: Response) => {
   const { userId } = req.params;
 
   if (!userId) {
-    return res
+    res
       .status(400)
       .json(new AppResult(AppErrorsMessages.MISSING_PROPS, null, 400));
+    return;
   }
 
   try {
@@ -331,7 +385,7 @@ export const getUserSubsctriptions = async (req: Request, res: Response) => {
       await subscriptionsResultsService.getUserSubsctriptions(userId);
 
     if (!subscriptions?.length) {
-      return res
+      res
         .status(400)
         .json(
           new AppResult(
@@ -340,16 +394,17 @@ export const getUserSubsctriptions = async (req: Request, res: Response) => {
             400
           )
         );
+      return;
     }
 
     const filteredSubscriptions = subscriptions.filter(
       (sub: ISubscriptionCreationResult) => sub.status !== "incomplete"
     );
 
-    return res.status(200).json(filteredSubscriptions);
+    res.status(200).json(filteredSubscriptions);
   } catch (e: any) {
     log.error("[StripeController.getUserSubsctriptions] EXCEPTION: ", e);
-    return res
+    res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
   }
@@ -379,10 +434,10 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
     }
   */
   try {
-    return await stripeWebhooks.hookEventsFromStripe(req, res);
+    await stripeWebhooks.hookEventsFromStripe(req, res);
   } catch (e: any) {
     log.error("[StripeController.hookEventsFromStripe] EXCEPTION: ", e);
-    return res
+    res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
   }

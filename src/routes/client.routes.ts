@@ -6,12 +6,16 @@ const router = express.Router();
 
 router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
+
+router.get("/plans", stripeController.getPlans);
+router.post("/checkout", stripeController.createCheckoutSession);
+
 /*
  * SUBSCRIPTION
  */
 
 // Private routes
-router.get("/plans", stripeController.getPlans);
+
 router.post("/subscription", verifyToken, stripeController.createSubsctription);
 router.put(
   "/subscription/cancel/:subscriptionId",

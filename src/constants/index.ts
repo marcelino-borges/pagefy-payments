@@ -13,6 +13,7 @@ export enum AppErrorsMessages {
   PAYMENT_INTENT_NOT_FOUND = "Payment intent not found.",
   USER_HAS_NOT_SUBSCRIPTIONS = "User has no subscriptions.",
   ERROR_ON_CONSTRUCT_EVENT = "Error constructing event.",
+  PRICE_ID_REQUIRED = "PriceId required.",
 }
 
 export const SYSTEM_EMAIL_CREDENTIALS = {
