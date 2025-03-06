@@ -6,7 +6,8 @@ export interface CreateCheckoutSessionPayload {
  * Stripe types
  */
 
-interface AutomaticTax {
+export interface AutomaticTax {
+  disabled_reason?: string | null;
   enabled: boolean;
   liability: string | null;
   status: string | null;

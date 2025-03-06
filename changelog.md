@@ -16,6 +16,11 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.10.0] - 2025-03-05
+
+- Feat: new endpoint to retrieve a Stripe's invoice by ID
+- Feat: endpoint to retrieve checkout session now fulfills invoice details
+
 ### [0.9.0] - 2025-03-05
 
 - Feat: new endpoint to retrieve a Stripe's checkout session by ID

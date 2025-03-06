@@ -10,6 +10,7 @@ import stripe from "../config/stripe";
 import { AppError } from "../utils/app-error";
 import { HttpStatusCode } from "axios";
 import { CheckoutSession } from "../models/checkout.models";
+import { Invoice } from "../models/invoice.models";
 
 export const getAllPlans = async () => {
   if (!stripe) return null;
@@ -123,8 +124,28 @@ export const getCheckoutSessionById = async (sessionId: string) => {
     );
 
   const session = await stripe.checkout.sessions.retrieve(sessionId);
+  let invoice: Invoice | undefined;
 
-  return session as CheckoutSession;
+  if (session.invoice && typeof session.invoice === "string") {
+    invoice = await getInvoiceById(session.invoice);
+  }
+
+  return {
+    ...session,
+    invoice: invoice ?? session.invoice,
+  };
+};
+
+export const getInvoiceById = async (invoiceId: string) => {
+  if (!stripe)
+    throw new AppError(
+      AppErrorsMessages.INTERNAL_ERROR,
+      HttpStatusCode.InternalServerError
+    );
+
+  const invoice = await stripe.invoices.retrieve(invoiceId);
+
+  return invoice as unknown as Invoice;
 };
 
 export const createCustomer = async (

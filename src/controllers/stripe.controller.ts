@@ -134,6 +134,50 @@ export const getCheckoutSessionById = async (req: Request, res: Response) => {
   }
 };
 
+export const getInvoiceById = async (req: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Invoice']
+    #swagger.summary = 'Gets an invoice by ID'
+    #swagger.description  = 'Gets an invoice by ID'
+    #swagger.parameters['invoiceId'] = {
+      in: 'params',
+      description: 'ID of the invoice in Stripe',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      schema: { $ref: "#/definitions/Invoice" },
+      description: 'Invoice in Stripe'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+
+  const { invoiceId } = req.params;
+
+  if (!invoiceId?.length) {
+    throw new AppError(AppErrorsMessages.INVOICE_ID_REQUIRED);
+  }
+
+  try {
+    const invoice = await stripeService.getInvoiceById(invoiceId);
+
+    res.status(200).json(invoice);
+  } catch (error: any) {
+    log.error("[StripeController.getInvoiceById] EXCEPTION: ", error);
+
+    const result = AppResult.fromError(error);
+
+    res.status(result.statusCode).json(result);
+  }
+};
+
 export const createSubsctription = async (req: Request, res: Response) => {
   /* 
     #swagger.tags = ['Subscription']

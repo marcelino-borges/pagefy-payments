@@ -20,6 +20,11 @@ router.get(
   "/checkout/session/:sessionId",
   stripeController.getCheckoutSessionById
 );
+
+router.get("/invoice/:invoiceId", stripeController.getInvoiceById);
+
+// OLD
+
 router.post("/subscription", verifyToken, stripeController.createSubsctription);
 router.put(
   "/subscription/cancel/:subscriptionId",

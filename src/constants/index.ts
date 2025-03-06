@@ -15,6 +15,7 @@ export enum AppErrorsMessages {
   ERROR_ON_CONSTRUCT_EVENT = "Error constructing event.",
   PRICE_ID_REQUIRED = "PriceId required.",
   SESSION_ID_REQUIRED = "SessionId required.",
+  INVOICE_ID_REQUIRED = "InvoiceId required.",
 }
 
 export const SYSTEM_EMAIL_CREDENTIALS = {
