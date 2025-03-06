@@ -16,7 +16,7 @@ import * as subscriptionsResultsService from "./../services/subscriptions-result
 import { AppError } from "../utils/app-error";
 import { HttpStatusCode } from "axios";
 
-export const getPlans = async (_: Request, res: Response) => {
+export const getAllPlans = async (_: Request, res: Response) => {
   /* 
     #swagger.tags = ['Plans']
     #swagger.summary = 'Gets all plans'
@@ -40,7 +40,50 @@ export const getPlans = async (_: Request, res: Response) => {
 
     res.status(200).json(products);
   } catch (e: any) {
-    log.error("[StripeController.getPlans] EXCEPTION: ", e);
+    log.error("[StripeController.getAllPlans] EXCEPTION: ", e);
+    res
+      .status(500)
+      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
+  }
+};
+
+export const getPlanById = async (req: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Plans']
+    #swagger.summary = 'Gets a plan by its ID'
+    #swagger.description  = 'Gets a plan by its ID'
+    #swagger.parameters['planId'] = {
+      in: 'body',
+      description: 'ID of the plan in Stripe',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      schema: { $ref: "#/definitions/Plan" },
+      description: 'Plan details'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+
+  const { planId } = req.body;
+
+  if (!planId?.length) {
+    throw new AppError(AppErrorsMessages.PLAN_ID_REQUIRED);
+  }
+
+  try {
+    const products: any = await stripeService.getPlanById(planId);
+
+    res.status(200).json(products);
+  } catch (e: any) {
+    log.error("[StripeController.getPlanById] EXCEPTION: ", e);
     res
       .status(500)
       .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));

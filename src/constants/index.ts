@@ -17,6 +17,7 @@ export enum AppErrorsMessages {
   SESSION_ID_REQUIRED = "SessionId required.",
   INVOICE_ID_REQUIRED = "InvoiceId required.",
   SUBSCRIPTION_ID_REQUIRED = "SubscriptionId required.",
+  PLAN_ID_REQUIRED = "PlanId required.",
 }
 
 export const SYSTEM_EMAIL_CREDENTIALS = {

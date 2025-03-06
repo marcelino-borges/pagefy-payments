@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "0.10.0",
+    "version": "0.11.0",
     "title": "REST API",
     "description": ""
   },
@@ -22,6 +22,43 @@
         "summary": "Gets all plans",
         "description": "Gets all plans",
         "parameters": [],
+        "responses": {
+          "200": {
+            "description": "List of plans with its prices",
+            "schema": {
+              "$ref": "#/definitions/Plans"
+            }
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          },
+          "500": {
+            "description": "Message of error",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/plans/{planId}": {
+      "get": {
+        "tags": [
+          "Plans"
+        ],
+        "summary": "Gets all plans",
+        "description": "Gets all plans",
+        "parameters": [
+          {
+            "name": "planId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "List of plans with its prices",
@@ -158,6 +195,64 @@
               "$ref": "#/definitions/Error"
             },
             "description": "Message of error"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          }
+        }
+      }
+    },
+    "/subscription/cancel": {
+      "patch": {
+        "tags": [
+          "Subscription"
+        ],
+        "summary": "Marks a subscription to be cancelled by the end of the current period",
+        "description": "Marks a subscription to be cancelled by the end of the current period",
+        "parameters": [
+          {
+            "name": "authorization",
+            "in": "header",
+            "type": "string"
+          },
+          {
+            "name": "subscriptionId",
+            "in": "params",
+            "description": "ID of the subscription in Stripe",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "schema": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success marking the subscription to be cancelled"
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          },
+          "401": {
+            "description": "Unauthorized"
           },
           "500": {
             "schema": {
@@ -512,6 +607,10 @@
           }
         },
         "url": {},
+        "name": {
+          "type": "string",
+          "example": "Boost"
+        },
         "prices": {
           "type": "array",
           "items": {
@@ -584,10 +683,6 @@
         "updated_at": {
           "type": "string",
           "example": "2025-03-04T20:33:32.000Z"
-        },
-        "name": {
-          "type": "string",
-          "example": "Boost"
         }
       }
     },
@@ -643,6 +738,10 @@
             }
           },
           "url": {},
+          "name": {
+            "type": "string",
+            "example": "Boost"
+          },
           "prices": {
             "type": "array",
             "items": {
@@ -715,10 +814,6 @@
           "updated_at": {
             "type": "string",
             "example": "2025-03-04T20:33:32.000Z"
-          },
-          "name": {
-            "type": "string",
-            "example": "Boost"
           }
         }
       }

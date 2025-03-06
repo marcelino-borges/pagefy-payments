@@ -27,6 +27,7 @@ export const planModel = {
   },
   images: ["https://files.stripe.com/links/1234"],
   url: null,
+  name: "Boost",
   prices: [
     {
       id: "price_1234",
@@ -51,7 +52,6 @@ export const planModel = {
   ],
   created_at: "2025-03-04T20:21:23.000Z",
   updated_at: "2025-03-04T20:33:32.000Z",
-  name: "Boost",
 };
 
 export const checkoutModel = {

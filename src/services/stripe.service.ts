@@ -136,6 +136,78 @@ export const getCheckoutSessionById = async (sessionId: string) => {
   };
 };
 
+export const getPlanById = async (planId: string) => {
+  if (!stripe)
+    throw new AppError(
+      AppErrorsMessages.INTERNAL_ERROR,
+      HttpStatusCode.InternalServerError
+    );
+
+  const product = await stripe.products.retrieve(planId);
+
+  const productPrices = await stripe.prices.list({
+    active: true,
+    product: product.id,
+  });
+
+  const {
+    // removed props
+    package_dimensions,
+    shippable,
+    unit_label,
+    livemode,
+    attributes,
+    object,
+    active,
+    marketing_features,
+    statement_descriptor,
+    tax_code,
+    type,
+    // adapted props
+    name,
+    metadata,
+    updated,
+    created,
+    ...withoutMetadata
+  } = product as any;
+
+  const features = {
+    pt: metadata.features_pt.split(";"),
+    en: metadata.features_en.split(";"),
+  };
+
+  const finalProduct = {
+    ...withoutMetadata,
+    features,
+    created_at: new Date(created * 1000),
+    updated_at: new Date(updated * 1000),
+    name: name.replace("Pagefy ", ""),
+    prices: productPrices.data.map(
+      ({
+        // removed props
+        livemode,
+        billing_scheme,
+        object,
+        active,
+        custom_unit_amount,
+        metadata,
+        nickname,
+        tax_behavior,
+        tiers_mode,
+        transform_quantity,
+        // adapted props
+        created,
+        ...price
+      }) => ({
+        ...price,
+        created_at: new Date(created * 1000),
+      })
+    ),
+  };
+
+  return finalProduct;
+};
+
 export const getInvoiceById = async (invoiceId: string) => {
   if (!stripe)
     throw new AppError(
