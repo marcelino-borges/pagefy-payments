@@ -9,7 +9,7 @@ import log from "../utils/logs";
 import stripe from "../config/stripe";
 import { AppError } from "../utils/app-error";
 import { HttpStatusCode } from "axios";
-import { CheckoutSession } from "../models/checkout.models";
+import { CheckoutSession } from "../models/stripe/checkout.models";
 import { Invoice } from "../models/invoice.models";
 
 export const getAllPlans = async () => {

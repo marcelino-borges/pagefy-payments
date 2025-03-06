@@ -8,7 +8,7 @@ router.use(express.urlencoded({ extended: false }));
 router.use(express.json());
 
 router.get("/plans", stripeController.getAllPlans);
-router.get("/plans/:planId", stripeController.getAllPlans);
+router.get("/plans/:planId", stripeController.getPlanById);
 router.post("/checkout", stripeController.createCheckoutSession);
 
 /*
