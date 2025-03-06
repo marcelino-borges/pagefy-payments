@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "0.7.1",
+    "version": "0.10.0",
     "title": "REST API",
     "description": ""
   },
@@ -40,6 +40,130 @@
             "schema": {
               "$ref": "#/definitions/Error"
             }
+          }
+        }
+      }
+    },
+    "/checkout": {
+      "post": {
+        "tags": [
+          "Checkout"
+        ],
+        "summary": "Creates a new checkout session",
+        "description": "Creates a new checkout session",
+        "parameters": [
+          {
+            "name": "priceId",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "schema": {
+                  "example": "any"
+                },
+                "description": {
+                  "example": "any"
+                }
+              }
+            },
+            "description": "ID of the price in Stripe",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New Stripe session",
+            "schema": {
+              "$ref": "#/definitions/Checkout"
+            }
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          }
+        }
+      }
+    },
+    "/checkout/session/{sessionId}": {
+      "get": {
+        "tags": [
+          "Checkout"
+        ],
+        "summary": "Gets a checkout session by ID",
+        "description": "Gets a checkout session by ID",
+        "parameters": [
+          {
+            "name": "sessionId",
+            "in": "params",
+            "required": true,
+            "type": "string",
+            "description": "ID of the checkout session in Stripe"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "New Stripe session",
+            "schema": {
+              "$ref": "#/definitions/Checkout"
+            }
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          }
+        }
+      }
+    },
+    "/invoice/{invoiceId}": {
+      "get": {
+        "tags": [
+          "Invoice"
+        ],
+        "summary": "Gets an invoice by ID",
+        "description": "Gets an invoice by ID",
+        "parameters": [
+          {
+            "name": "invoiceId",
+            "in": "params",
+            "required": true,
+            "type": "string",
+            "description": "ID of the invoice in Stripe"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Invoice in Stripe",
+            "schema": {
+              "$ref": "#/definitions/Invoice"
+            }
+          },
+          "400": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
+          },
+          "500": {
+            "schema": {
+              "$ref": "#/definitions/Error"
+            },
+            "description": "Message of error"
           }
         }
       }
@@ -596,6 +720,813 @@
             "type": "string",
             "example": "Boost"
           }
+        }
+      }
+    },
+    "Checkout": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "cs_1234"
+        },
+        "object": {
+          "type": "string",
+          "example": "checkout.session"
+        },
+        "adaptive_pricing": {},
+        "after_expiration": {},
+        "allow_promotion_codes": {},
+        "amount_subtotal": {
+          "type": "number",
+          "example": 3990
+        },
+        "amount_total": {
+          "type": "number",
+          "example": 3990
+        },
+        "automatic_tax": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "example": false
+            },
+            "liability": {},
+            "status": {}
+          }
+        },
+        "billing_address_collection": {},
+        "cancel_url": {
+          "type": "string",
+          "example": "https://example.me"
+        },
+        "client_reference_id": {},
+        "client_secret": {},
+        "collected_information": {},
+        "consent": {},
+        "consent_collection": {},
+        "created": {
+          "type": "number",
+          "example": 1741211151
+        },
+        "currency": {
+          "type": "string",
+          "example": "brl"
+        },
+        "currency_conversion": {},
+        "custom_fields": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "custom_text": {
+          "type": "object",
+          "properties": {
+            "after_submit": {},
+            "shipping_address": {},
+            "submit": {},
+            "terms_of_service_acceptance": {}
+          }
+        },
+        "customer": {},
+        "customer_creation": {
+          "type": "string",
+          "example": "always"
+        },
+        "customer_details": {},
+        "customer_email": {},
+        "discounts": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "expires_at": {
+          "type": "number",
+          "example": 1741297551
+        },
+        "invoice": {},
+        "invoice_creation": {},
+        "livemode": {
+          "type": "boolean",
+          "example": false
+        },
+        "locale": {},
+        "metadata": {
+          "type": "object",
+          "properties": {}
+        },
+        "mode": {
+          "type": "string",
+          "example": "subscription"
+        },
+        "payment_intent": {},
+        "payment_link": {},
+        "payment_method_collection": {
+          "type": "string",
+          "example": "always"
+        },
+        "payment_method_configuration_details": {},
+        "payment_method_options": {
+          "type": "object",
+          "properties": {
+            "card": {
+              "type": "object",
+              "properties": {
+                "request_three_d_secure": {
+                  "type": "string",
+                  "example": "automatic"
+                }
+              }
+            }
+          }
+        },
+        "payment_method_types": {
+          "type": "array",
+          "example": [
+            "card"
+          ],
+          "items": {
+            "type": "string"
+          }
+        },
+        "payment_status": {
+          "type": "string",
+          "example": "unpaid"
+        },
+        "phone_number_collection": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "example": false
+            }
+          }
+        },
+        "recovered_from": {},
+        "saved_payment_method_options": {
+          "type": "object",
+          "properties": {
+            "allow_redisplay_filters": {
+              "type": "array",
+              "example": [
+                "always"
+              ],
+              "items": {
+                "type": "string"
+              }
+            },
+            "payment_method_remove": {},
+            "payment_method_save": {}
+          }
+        },
+        "setup_intent": {},
+        "shipping_address_collection": {},
+        "shipping_cost": {},
+        "shipping_options": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "status": {
+          "type": "string",
+          "example": "open"
+        },
+        "submit_type": {},
+        "subscription": {},
+        "success_url": {
+          "type": "string",
+          "example": "https://example.me"
+        },
+        "total_details": {
+          "type": "object",
+          "properties": {
+            "amount_discount": {
+              "type": "number",
+              "example": 0
+            },
+            "amount_shipping": {
+              "type": "number",
+              "example": 0
+            },
+            "amount_tax": {
+              "type": "number",
+              "example": 0
+            }
+          }
+        },
+        "ui_mode": {
+          "type": "string",
+          "example": "hosted"
+        },
+        "url": {
+          "type": "string",
+          "example": "https://checkout.stripe.com/c/pay/cs_1234"
+        }
+      }
+    },
+    "Invoice": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "in_1234"
+        },
+        "object": {
+          "type": "string",
+          "example": "invoice"
+        },
+        "account_country": {
+          "type": "string",
+          "example": "BR"
+        },
+        "account_name": {
+          "type": "string",
+          "example": "Lorem"
+        },
+        "account_tax_ids": {},
+        "amount_due": {
+          "type": "number",
+          "example": 3990
+        },
+        "amount_paid": {
+          "type": "number",
+          "example": 3990
+        },
+        "amount_remaining": {
+          "type": "number",
+          "example": 0
+        },
+        "amount_shipping": {
+          "type": "number",
+          "example": 0
+        },
+        "application": {},
+        "application_fee_amount": {},
+        "attempt_count": {
+          "type": "number",
+          "example": 1
+        },
+        "attempted": {
+          "type": "boolean",
+          "example": true
+        },
+        "auto_advance": {
+          "type": "boolean",
+          "example": false
+        },
+        "automatic_tax": {
+          "type": "object",
+          "properties": {
+            "disabled_reason": {},
+            "enabled": {
+              "type": "boolean",
+              "example": false
+            },
+            "liability": {},
+            "status": {}
+          }
+        },
+        "automatically_finalizes_at": {},
+        "billing_reason": {
+          "type": "string",
+          "example": "subscription_create"
+        },
+        "charge": {
+          "type": "string",
+          "example": "ch_1234"
+        },
+        "collection_method": {
+          "type": "string",
+          "example": "charge_automatically"
+        },
+        "created": {
+          "type": "number",
+          "example": 1741215676
+        },
+        "currency": {
+          "type": "string",
+          "example": "brl"
+        },
+        "custom_fields": {},
+        "customer": {
+          "type": "string",
+          "example": "cus_1234"
+        },
+        "customer_address": {
+          "type": "object",
+          "properties": {
+            "city": {},
+            "country": {
+              "type": "string",
+              "example": "BR"
+            },
+            "line1": {},
+            "line2": {},
+            "postal_code": {},
+            "state": {}
+          }
+        },
+        "customer_email": {
+          "type": "string",
+          "example": "email@email.com"
+        },
+        "customer_name": {
+          "type": "string",
+          "example": "John"
+        },
+        "customer_phone": {},
+        "customer_shipping": {},
+        "customer_tax_exempt": {
+          "type": "string",
+          "example": "none"
+        },
+        "customer_tax_ids": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "default_payment_method": {},
+        "default_source": {},
+        "default_tax_rates": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "description": {},
+        "discount": {},
+        "discounts": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "due_date": {},
+        "effective_at": {
+          "type": "number",
+          "example": 1741215676
+        },
+        "ending_balance": {
+          "type": "number",
+          "example": 0
+        },
+        "footer": {},
+        "from_invoice": {},
+        "hosted_invoice_url": {
+          "type": "string",
+          "example": "https://invoice.stripe.com/i/acct_1234/abcd?s=ap"
+        },
+        "invoice_pdf": {
+          "type": "string",
+          "example": "https://pay.stripe.com/invoice/acct_1234/abcd/pdf?s=ap"
+        },
+        "issuer": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "example": "self"
+            }
+          }
+        },
+        "last_finalization_error": {},
+        "latest_revision": {},
+        "lines": {
+          "type": "object",
+          "properties": {
+            "object": {
+              "type": "string",
+              "example": "list"
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "il_1234"
+                  },
+                  "object": {
+                    "type": "string",
+                    "example": "line_item"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 3990
+                  },
+                  "amount_excluding_tax": {
+                    "type": "number",
+                    "example": 3990
+                  },
+                  "currency": {
+                    "type": "string",
+                    "example": "usd"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "1 × Lorem Product (at $ 99.90 / month)"
+                  },
+                  "discount_amounts": {
+                    "type": "array",
+                    "example": [],
+                    "items": {}
+                  },
+                  "discountable": {
+                    "type": "boolean",
+                    "example": true
+                  },
+                  "discounts": {
+                    "type": "array",
+                    "example": [],
+                    "items": {}
+                  },
+                  "invoice": {
+                    "type": "string",
+                    "example": "in_1234"
+                  },
+                  "livemode": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {}
+                  },
+                  "period": {
+                    "type": "object",
+                    "properties": {
+                      "end": {
+                        "type": "number",
+                        "example": 1743894076
+                      },
+                      "start": {
+                        "type": "number",
+                        "example": 1741215676
+                      }
+                    }
+                  },
+                  "plan": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "price_1234"
+                      },
+                      "object": {
+                        "type": "string",
+                        "example": "plan"
+                      },
+                      "active": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "aggregate_usage": {},
+                      "amount": {
+                        "type": "number",
+                        "example": 3990
+                      },
+                      "amount_decimal": {
+                        "type": "string",
+                        "example": "3990"
+                      },
+                      "billing_scheme": {
+                        "type": "string",
+                        "example": "per_unit"
+                      },
+                      "created": {
+                        "type": "number",
+                        "example": 1741119684
+                      },
+                      "currency": {
+                        "type": "string",
+                        "example": "brl"
+                      },
+                      "interval": {
+                        "type": "string",
+                        "example": "month"
+                      },
+                      "interval_count": {
+                        "type": "number",
+                        "example": 1
+                      },
+                      "livemode": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "properties": {}
+                      },
+                      "meter": {},
+                      "nickname": {},
+                      "product": {
+                        "type": "string",
+                        "example": "prod_1234"
+                      },
+                      "tiers_mode": {},
+                      "transform_usage": {},
+                      "trial_period_days": {},
+                      "usage_type": {
+                        "type": "string",
+                        "example": "licensed"
+                      }
+                    }
+                  },
+                  "pretax_credit_amounts": {
+                    "type": "array",
+                    "example": [],
+                    "items": {}
+                  },
+                  "price": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "price_1234"
+                      },
+                      "object": {
+                        "type": "string",
+                        "example": "price"
+                      },
+                      "active": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "billing_scheme": {
+                        "type": "string",
+                        "example": "per_unit"
+                      },
+                      "created": {
+                        "type": "number",
+                        "example": 1741119684
+                      },
+                      "currency": {
+                        "type": "string",
+                        "example": "brl"
+                      },
+                      "custom_unit_amount": {},
+                      "livemode": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "lookup_key": {
+                        "type": "string",
+                        "example": "pagefy_sub_lorem"
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "properties": {}
+                      },
+                      "nickname": {},
+                      "product": {
+                        "type": "string",
+                        "example": "prod_1234"
+                      },
+                      "recurring": {
+                        "type": "object",
+                        "properties": {
+                          "aggregate_usage": {},
+                          "interval": {
+                            "type": "string",
+                            "example": "month"
+                          },
+                          "interval_count": {
+                            "type": "number",
+                            "example": 1
+                          },
+                          "meter": {},
+                          "trial_period_days": {},
+                          "usage_type": {
+                            "type": "string",
+                            "example": "licensed"
+                          }
+                        }
+                      },
+                      "tax_behavior": {
+                        "type": "string",
+                        "example": "unspecified"
+                      },
+                      "tiers_mode": {},
+                      "transform_quantity": {},
+                      "type": {
+                        "type": "string",
+                        "example": "recurring"
+                      },
+                      "unit_amount": {
+                        "type": "number",
+                        "example": 3990
+                      },
+                      "unit_amount_decimal": {
+                        "type": "string",
+                        "example": "3990"
+                      }
+                    }
+                  },
+                  "proration": {
+                    "type": "boolean",
+                    "example": false
+                  },
+                  "proration_details": {
+                    "type": "object",
+                    "properties": {
+                      "credited_items": {}
+                    }
+                  },
+                  "quantity": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "subscription": {
+                    "type": "string",
+                    "example": "sub_1234"
+                  },
+                  "subscription_item": {
+                    "type": "string",
+                    "example": "si_1234"
+                  },
+                  "tax_amounts": {
+                    "type": "array",
+                    "example": [],
+                    "items": {}
+                  },
+                  "tax_rates": {
+                    "type": "array",
+                    "example": [],
+                    "items": {}
+                  },
+                  "type": {
+                    "type": "string",
+                    "example": "subscription"
+                  },
+                  "unit_amount_excluding_tax": {
+                    "type": "string",
+                    "example": "3990"
+                  }
+                }
+              }
+            },
+            "has_more": {
+              "type": "boolean",
+              "example": false
+            },
+            "total_count": {
+              "type": "number",
+              "example": 1
+            },
+            "url": {
+              "type": "string",
+              "example": "/v1/invoices/in_1234/lines"
+            }
+          }
+        },
+        "livemode": {
+          "type": "boolean",
+          "example": false
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {}
+        },
+        "next_payment_attempt": {},
+        "number": {
+          "type": "string",
+          "example": "E7F24301-0001"
+        },
+        "on_behalf_of": {},
+        "paid": {
+          "type": "boolean",
+          "example": true
+        },
+        "paid_out_of_band": {
+          "type": "boolean",
+          "example": false
+        },
+        "payment_intent": {
+          "type": "string",
+          "example": "pi_1234"
+        },
+        "payment_settings": {
+          "type": "object",
+          "properties": {
+            "default_mandate": {},
+            "payment_method_options": {
+              "type": "object",
+              "properties": {
+                "acss_debit": {},
+                "bancontact": {},
+                "card": {
+                  "type": "object",
+                  "properties": {
+                    "request_three_d_secure": {
+                      "type": "string",
+                      "example": "automatic"
+                    }
+                  }
+                },
+                "customer_balance": {},
+                "konbini": {},
+                "sepa_debit": {},
+                "us_bank_account": {}
+              }
+            },
+            "payment_method_types": {}
+          }
+        },
+        "period_end": {
+          "type": "number",
+          "example": 1741215676
+        },
+        "period_start": {
+          "type": "number",
+          "example": 1741215676
+        },
+        "post_payment_credit_notes_amount": {
+          "type": "number",
+          "example": 0
+        },
+        "pre_payment_credit_notes_amount": {
+          "type": "number",
+          "example": 0
+        },
+        "quote": {},
+        "receipt_number": {},
+        "rendering": {},
+        "shipping_cost": {},
+        "shipping_details": {},
+        "starting_balance": {
+          "type": "number",
+          "example": 0
+        },
+        "statement_descriptor": {},
+        "status": {
+          "type": "string",
+          "example": "paid"
+        },
+        "status_transitions": {
+          "type": "object",
+          "properties": {
+            "finalized_at": {
+              "type": "number",
+              "example": 1741215676
+            },
+            "marked_uncollectible_at": {},
+            "paid_at": {
+              "type": "number",
+              "example": 1741215678
+            },
+            "voided_at": {}
+          }
+        },
+        "subscription": {
+          "type": "string",
+          "example": "sub_1234"
+        },
+        "subscription_details": {
+          "type": "object",
+          "properties": {
+            "metadata": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        "subtotal": {
+          "type": "number",
+          "example": 3990
+        },
+        "subtotal_excluding_tax": {
+          "type": "number",
+          "example": 3990
+        },
+        "tax": {},
+        "test_clock": {},
+        "total": {
+          "type": "number",
+          "example": 3990
+        },
+        "total_discount_amounts": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "total_excluding_tax": {
+          "type": "number",
+          "example": 3990
+        },
+        "total_pretax_credit_amounts": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "total_tax_amounts": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "transfer_data": {},
+        "webhooks_delivered_at": {
+          "type": "number",
+          "example": 1741215680
         }
       }
     }
