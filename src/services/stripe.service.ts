@@ -148,6 +148,18 @@ export const getInvoiceById = async (invoiceId: string) => {
   return invoice as unknown as Invoice;
 };
 
+export const cancelSubscriptionAtPeriodEnd = async (subscriptionId: string) => {
+  if (!stripe)
+    throw new AppError(
+      AppErrorsMessages.INTERNAL_ERROR,
+      HttpStatusCode.InternalServerError
+    );
+
+  await stripe.subscriptions.update(subscriptionId, {
+    cancel_at_period_end: true,
+  });
+};
+
 export const createCustomer = async (
   user: IUser
 ): Promise<Stripe.Customer | null> => {

@@ -14,6 +14,7 @@ import { updateUser } from "./../services/user.service";
 import * as stripeWebhooks from "../services/webhooks";
 import * as subscriptionsResultsService from "./../services/subscriptions-results.service";
 import { AppError } from "../utils/app-error";
+import { HttpStatusCode } from "axios";
 
 export const getPlans = async (_: Request, res: Response) => {
   /* 
@@ -171,6 +172,58 @@ export const getInvoiceById = async (req: Request, res: Response) => {
     res.status(200).json(invoice);
   } catch (error: any) {
     log.error("[StripeController.getInvoiceById] EXCEPTION: ", error);
+
+    const result = AppResult.fromError(error);
+
+    res.status(result.statusCode).json(result);
+  }
+};
+
+export const cancelSubscriptionAtPeriodEnd = async (
+  req: Request,
+  res: Response
+) => {
+  /* 
+    #swagger.tags = ['Subscription']
+    #swagger.summary = 'Marks a subscription to be cancelled by the end of the current period'
+    #swagger.description  = 'Marks a subscription to be cancelled by the end of the current period'
+    #swagger.parameters['subscriptionId'] = {
+      in: 'params',
+      description: 'ID of the subscription in Stripe',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      description: 'Success marking the subscription to be cancelled'
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+
+  const { subscriptionId } = req.body;
+
+  if (!subscriptionId?.length) {
+    throw new AppError(AppErrorsMessages.SUBSCRIPTION_ID_REQUIRED);
+  }
+
+  try {
+    await stripeService.cancelSubscriptionAtPeriodEnd(subscriptionId);
+
+    res.status(HttpStatusCode.Ok).json({
+      message:
+        "Subscription marked to be cancelled by the end of it's current period",
+    });
+  } catch (error: any) {
+    log.error(
+      "[StripeController.cancelSubscriptionAtPeriodEnd] EXCEPTION: ",
+      error
+    );
 
     const result = AppResult.fromError(error);
 

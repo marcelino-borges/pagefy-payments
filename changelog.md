@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.11.0] - 2025-03-05
+
+- Feat: new endpoint to cancel an existing subscription
+
 ### [0.10.0] - 2025-03-05
 
 - Feat: new endpoint to retrieve a Stripe's invoice by ID

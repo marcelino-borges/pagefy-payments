@@ -25,6 +25,11 @@ router.get("/invoice/:invoiceId", stripeController.getInvoiceById);
 
 // OLD
 
+router.patch(
+  "/subscription/cancel",
+  verifyToken,
+  stripeController.cancelSubscriptionAtPeriodEnd
+);
 router.post("/subscription", verifyToken, stripeController.createSubsctription);
 router.put(
   "/subscription/cancel/:subscriptionId",
