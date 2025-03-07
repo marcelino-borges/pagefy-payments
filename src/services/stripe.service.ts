@@ -10,7 +10,7 @@ import stripe from "../config/stripe";
 import { AppError } from "../utils/app-error";
 import { HttpStatusCode } from "axios";
 import { CheckoutSession } from "../models/stripe/checkout.models";
-import { Invoice } from "../models/invoice.models";
+import { Invoice } from "../models/stripe/invoice.models";
 
 export const getAllPlans = async () => {
   if (!stripe) return null;
