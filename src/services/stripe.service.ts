@@ -90,7 +90,12 @@ export const getAllPlans = async () => {
   return withFilledPrices;
 };
 
-export const createCheckoutSession = async (priceId: string) => {
+export const createCheckoutSession = async (
+  priceId: string,
+  email: string,
+  currency: string,
+  locale: string
+) => {
   const appUrl = process.env.APP_URL;
 
   if (!stripe || !process.env.APP_URL)
@@ -103,6 +108,23 @@ export const createCheckoutSession = async (priceId: string) => {
     mode: "subscription",
     ui_mode: "hosted",
     payment_method_types: ["card"],
+    customer_email: email,
+    currency,
+    locale: locale as Stripe.Checkout.SessionCreateParams.Locale,
+    custom_fields: [
+      {
+        key: "cpf",
+        label: {
+          custom: "CPF/ID",
+          type: "custom",
+        },
+        type: "numeric",
+        numeric: {
+          maximum_length: 11,
+          minimum_length: 11,
+        },
+      },
+    ],
     line_items: [
       {
         price: priceId,

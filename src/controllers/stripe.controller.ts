@@ -11,10 +11,12 @@ import log from "../utils/logs";
 import Stripe from "stripe";
 import { IUser } from "./../models/user.models";
 import { updateUser } from "./../services/user.service";
-import * as stripeWebhooks from "../services/webhooks";
 import * as subscriptionsResultsService from "./../services/subscriptions-results.service";
 import { AppError } from "../utils/app-error";
 import { HttpStatusCode } from "axios";
+import { buildStripeEvent } from "../adapters";
+import { handlePaymentIntent } from "../services/webhooks/payment-intent.service";
+import { handleInvoice } from "../services/webhooks/invoice.service";
 
 export const getAllPlans = async (_: Request, res: Response) => {
   /* 
@@ -115,14 +117,24 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     }
   */
 
-  const { priceId } = req.body;
+  const { priceId, email, currency, locale } = req.body;
 
-  if (!priceId?.length) {
-    throw new AppError(AppErrorsMessages.PRICE_ID_REQUIRED);
+  if (
+    !priceId?.length ||
+    !email?.length ||
+    !currency?.length ||
+    !locale?.length
+  ) {
+    throw new AppError(AppErrorsMessages.MISSING_PROPS);
   }
 
   try {
-    const newSession = await stripeService.createCheckoutSession(priceId);
+    const newSession = await stripeService.createCheckoutSession(
+      priceId,
+      email,
+      currency,
+      locale
+    );
 
     res.status(200).json(newSession);
   } catch (error: any) {
@@ -618,11 +630,27 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
     }
   */
   try {
-    await stripeWebhooks.hookEventsFromStripe(req, res);
-  } catch (e: any) {
-    log.error("[StripeController.hookEventsFromStripe] EXCEPTION: ", e);
-    res
-      .status(500)
-      .json(new AppResult(AppErrorsMessages.INTERNAL_ERROR, e.message, 500));
+    const event = buildStripeEvent(
+      req.body,
+      req.headers["stripe-signature"] as string
+    );
+
+    console.log("🔔 Received event " + JSON.stringify(event));
+    return;
+
+    if (event.type.includes("payment_intent")) {
+      handlePaymentIntent(event);
+    } else if (event.type.includes("invoice")) {
+      handleInvoice(event);
+    } else if (event.type.includes("subscription_schedule")) {
+      handleInvoice(event);
+    }
+
+    res.send(new AppResult("Webhook received", null, 200));
+  } catch (error) {
+    log.error("[StripeController.hookEventsFromStripe] EXCEPTION: ", error);
+
+    const result = AppResult.fromError(error);
+    res.status(result.statusCode).json(result);
   }
 };
