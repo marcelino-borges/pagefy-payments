@@ -53,7 +53,7 @@ export const getPlanById = async (req: Request, res: Response) => {
     #swagger.summary = 'Gets a plan by its ID'
     #swagger.description  = 'Gets a plan by its ID'
     #swagger.parameters['planId'] = {
-      in: 'body',
+      in: 'params',
       description: 'ID of the plan in Stripe',
       required: true,
       type: 'string'
@@ -72,13 +72,13 @@ export const getPlanById = async (req: Request, res: Response) => {
     }
   */
 
-  const { planId } = req.body;
-
-  if (!planId?.length) {
-    throw new AppError(AppErrorsMessages.PLAN_ID_REQUIRED);
-  }
+  const { planId } = req.params;
 
   try {
+    if (!planId?.length) {
+      throw new AppError(AppErrorsMessages.PLAN_ID_REQUIRED);
+    }
+
     const products: any = await stripeService.getPlanById(planId);
 
     res.status(200).json(products);

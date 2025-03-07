@@ -48,7 +48,7 @@ if (canReadEnv) {
       app.use("/api/v1", routesClient);
 
       const server = app.listen(PORT, () => {
-        console.log(`Listening on port ${PORT}`);
+        console.log(`✅ Listening on port ${PORT}`);
       });
 
       server.timeout = 3000;
