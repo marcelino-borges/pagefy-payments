@@ -1,19 +1,17 @@
 import Stripe from "stripe";
-import { AppErrorsMessages } from "../constants";
-import { IUser, PlansTypes } from "../models/user.models";
-import SubscriptionsDB, {
-  SubscriptionStatus,
-} from "../models/subscription.models";
-import { getPriceIdByRecurrencyAndPlanType } from "../utils/stripe";
-import log from "../utils/logs";
-import stripe from "../config/stripe";
-import { AppError } from "../utils/app-error";
+import { Types } from "mongoose";
 import { HttpStatusCode } from "axios";
-import { CheckoutSession } from "../models/stripe/checkout.models";
-import { Invoice } from "../models/stripe/invoice.models";
+import { AppErrorsMessages } from "@/constants";
+import stripe from "@/config/stripe";
+import { AppError } from "@/utils/app-error";
+import { Invoice } from "@/models/stripe/invoice.models";
+import { Session } from "@/models/stripe/session.models";
+import { checkoutDB } from "@/models/stripe/checkout.models";
+import log from "@/utils/logs";
+import { buildStripeClientError } from "@/utils";
 
 export const getAllPlans = async () => {
-  if (!stripe) return null;
+  if (!stripe) throw buildStripeClientError("Services.Stripe.getAllPlans");
 
   const products = await stripe.products.list({ active: true });
 
@@ -94,15 +92,13 @@ export const createCheckoutSession = async (
   priceId: string,
   email: string,
   currency: string,
-  locale: string
+  locale: string,
+  userId: string
 ) => {
   const appUrl = process.env.APP_URL;
 
   if (!stripe || !process.env.APP_URL)
-    throw new AppError(
-      AppErrorsMessages.INTERNAL_ERROR,
-      HttpStatusCode.InternalServerError
-    );
+    throw buildStripeClientError("Services.Stripe.createCheckoutSession");
 
   const newSession = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -135,15 +131,26 @@ export const createCheckoutSession = async (
     cancel_url: `${appUrl}/checkout/cancel?session_id={CHECKOUT_SESSION_ID}`,
   });
 
-  return newSession as CheckoutSession;
+  try {
+    await checkoutDB.create({
+      userId: new Types.ObjectId(userId),
+      session: newSession,
+    });
+    log.success("Checkout Session created in MongoDB");
+  } catch (error) {
+    throw new AppError(
+      AppErrorsMessages.CREATE_CHECKOUT_SESSION,
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
+  }
+
+  return newSession as Session;
 };
 
 export const getCheckoutSessionById = async (sessionId: string) => {
   if (!stripe)
-    throw new AppError(
-      AppErrorsMessages.INTERNAL_ERROR,
-      HttpStatusCode.InternalServerError
-    );
+    throw buildStripeClientError("Services.Stripe.getCheckoutSessionById");
 
   const session = await stripe.checkout.sessions.retrieve(sessionId);
   let invoice: Invoice | undefined;
@@ -159,11 +166,7 @@ export const getCheckoutSessionById = async (sessionId: string) => {
 };
 
 export const getPlanById = async (planId: string) => {
-  if (!stripe)
-    throw new AppError(
-      AppErrorsMessages.INTERNAL_ERROR,
-      HttpStatusCode.InternalServerError
-    );
+  if (!stripe) throw buildStripeClientError("Services.Stripe.getPlanById");
 
   const product = await stripe.products.retrieve(planId);
 
@@ -231,165 +234,67 @@ export const getPlanById = async (planId: string) => {
 };
 
 export const getInvoiceById = async (invoiceId: string) => {
-  if (!stripe)
-    throw new AppError(
-      AppErrorsMessages.INTERNAL_ERROR,
-      HttpStatusCode.InternalServerError
-    );
+  if (!stripe) throw buildStripeClientError("Services.Stripe.getInvoiceById");
 
   const invoice = await stripe.invoices.retrieve(invoiceId);
 
   return invoice as unknown as Invoice;
 };
 
-export const cancelSubscriptionAtPeriodEnd = async (subscriptionId: string) => {
+export const getExpandedCheckoutSessionByIdOnStripe = async (
+  sessionId: string
+) => {
   if (!stripe)
-    throw new AppError(
-      AppErrorsMessages.INTERNAL_ERROR,
-      HttpStatusCode.InternalServerError
+    throw buildStripeClientError(
+      "Services.Stripe.getExpandedCheckoutSessionByIdOnStripe"
     );
 
-  await stripe.subscriptions.update(subscriptionId, {
-    cancel_at_period_end: true,
-  });
-};
-
-export const createCustomer = async (
-  user: IUser
-): Promise<Stripe.Customer | null> => {
-  if (!stripe) return null;
-
-  const params: Stripe.CustomerCreateParams = {
-    email: user.email,
-    name: `${user.firstName} ${user.lastName}`,
-    metadata: {
-      authId: user.authId || null,
-      userId: user._id?.toString() || null,
-    },
-  };
-
-  const customer: Stripe.Customer = await stripe.customers.create(params);
-
-  if (customer) return customer;
-  return null;
-};
-
-export const assureStripeCustomerCreated = async (
-  user: IUser
-): Promise<IUser> => {
-  if (user.paymentId) {
-    return user;
-  }
-
-  const customer: Stripe.Customer | null = await createCustomer(user);
-
-  if (!customer)
-    throw new Error(AppErrorsMessages.PAYMENT_CUSTOMER_NOT_CREATED);
-
-  return {
-    ...user,
-    paymentId: customer.id,
-  };
-};
-
-export const getSubsctriptionPaymentIntent = async (
-  paymentIntentId: string
-) => {
-  if (!stripe) return null;
-
-  if (!paymentIntentId) {
-    return null;
-  }
-
-  const paymentIntent = stripe.paymentIntents.retrieve(paymentIntentId);
-
-  if (!paymentIntent) {
-    return null;
-  }
-  return paymentIntent;
-};
-
-export const createSubscriptionOnStripe = async (
-  paymentId: string,
-  currency: string,
-  recurrency: "month" | "year",
-  planType: PlansTypes
-) => {
-  if (!stripe) return null;
-
-  if (!paymentId) {
-    return null;
-  }
-
-  const priceId = getPriceIdByRecurrencyAndPlanType(recurrency, planType);
-
-  if (!priceId) {
-    return null;
-  }
-
-  const subscription = stripe.subscriptions.create({
-    customer: paymentId,
-    items: [
-      {
-        price: priceId,
-      },
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: [
+      "invoice",
+      "invoice.charge",
+      "subscription",
+      "subscription.items.data.plan",
+      "subscription.items.data.price",
+      "customer",
     ],
-    cancel_at_period_end: true,
-    currency,
-    collection_method: "charge_automatically",
-    payment_settings: { save_default_payment_method: "on_subscription" },
-    payment_behavior: "default_incomplete",
-    expand: ["latest_invoice.payment_intent"],
   });
 
-  if (!subscription) {
-    return null;
-  }
+  return session;
+};
+
+export const getSubscriptionByIdOnStripe = async (subscriptionId: string) => {
+  if (!stripe)
+    throw buildStripeClientError("Services.Stripe.getSubscriptionByIdOnStripe");
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+
+  return subscription;
+};
+
+export const getExpandedSubscriptionByIdOnStripe = async (
+  subscriptionId: string
+) => {
+  if (!stripe)
+    throw buildStripeClientError(
+      "Services.Stripe.getExpandedSubscriptionByIdOnStripe"
+    );
+
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+    expand: [
+      "latest_invoice",
+      "items.data.plan",
+      "items.data.price",
+      "customer",
+    ],
+  });
+
   return subscription;
 };
 
 export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
-  if (!stripe) return null;
+  if (!stripe)
+    throw buildStripeClientError("Services.Stripe.cancelSubscriptionOnStripe");
 
-  const subscriptionUpdated = await SubscriptionsDB.findOneAndUpdate(
-    {
-      subscriptionId,
-    },
-    {
-      status: SubscriptionStatus.canceled,
-    },
-    {
-      new: true,
-    }
-  );
-
-  if (!subscriptionUpdated) {
-    return null;
-  }
-
-  const subscription = stripe.subscriptions.cancel(subscriptionId);
-
-  if (!subscription) {
-    return null;
-  }
-
-  return subscriptionUpdated;
-};
-
-export const createSubscriptionSchedule = async (subscriptionId: string) => {
-  if (!stripe) return null;
-
-  return stripe.subscriptionSchedules
-    .create({
-      from_subscription: subscriptionId,
-    })
-    .then((response: Stripe.Response<Stripe.SubscriptionSchedule>) => {
-      return response;
-    })
-    .catch((error: any) => {
-      log.error(
-        `Error on createSubscriptionSchedule() for subscription ${subscriptionId}. `,
-        error.message
-      );
-    });
+  await stripe.subscriptions.cancel(subscriptionId);
 };

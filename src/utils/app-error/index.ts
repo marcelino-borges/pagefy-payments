@@ -1,3 +1,5 @@
+import log from "../logs";
+
 export class AppError extends Error {
   readonly statusCode?: number;
   readonly originalError?: Error;
@@ -7,6 +9,6 @@ export class AppError extends Error {
     this.statusCode = statusCode;
     this.originalError = originalError;
 
-    console.error(`Error: ${message}. Details: ${originalError}`);
+    log.error(`Error: ${message}. Details: ${originalError}`);
   }
 }

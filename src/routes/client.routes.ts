@@ -1,6 +1,6 @@
 import * as express from "express";
-import * as stripeController from "../controllers/stripe.controller";
-import { verifyToken } from "../middlewares/auth";
+import * as stripeController from "@/controllers/stripe.controller";
+import { verifyToken } from "@/middlewares/auth.middleware";
 
 const router = express.Router();
 
@@ -9,13 +9,7 @@ router.use(express.json());
 
 router.get("/plans/:planId", stripeController.getPlanById);
 router.get("/plans", stripeController.getAllPlans);
-router.post("/checkout", stripeController.createCheckoutSession);
-
-/*
- * SUBSCRIPTION
- */
-
-// Private routes
+router.post("/checkout", verifyToken, stripeController.createCheckoutSession);
 
 router.get(
   "/checkout/session/:sessionId",
@@ -24,28 +18,16 @@ router.get(
 
 router.get("/invoice/:invoiceId", stripeController.getInvoiceById);
 
-// OLD
-
 router.patch(
-  "/subscription/cancel",
-  verifyToken,
-  stripeController.cancelSubscriptionAtPeriodEnd
-);
-router.post("/subscription", verifyToken, stripeController.createSubsctription);
-router.put(
   "/subscription/cancel/:subscriptionId",
   verifyToken,
   stripeController.cancelSubsctription
 );
+
 router.get(
-  "/subscription/paymentintent/:paymentIntentId",
+  "/subscription/:subscriptionId",
   verifyToken,
-  stripeController.getSubsctriptionPaymentIntent
-);
-router.get(
-  "/subscription/user/:userId",
-  verifyToken,
-  stripeController.getUserSubsctriptions
+  stripeController.getSubsctriptionById
 );
 
 export default router;

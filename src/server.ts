@@ -10,6 +10,7 @@ import swaggerUi from "swagger-ui-express";
 import connectMongo from "./config/mongo";
 import firebaseConfig from "./config/firebase";
 import log from "./utils/logs";
+import { HttpStatusCode } from "axios";
 
 dotenvSafe.config({
   allowEmptyValues: true,
@@ -41,7 +42,7 @@ if (canReadEnv) {
       app.use(helmet());
       app.options("*", publicCors);
       app.use("/health-check", publicCors, (_, res) => {
-        res.status(200).json({ message: "API running." });
+        res.status(HttpStatusCode.Ok).json({ message: "API running." });
       });
       app.use("/swagger", swaggerUi.serve, swaggerUi.setup(swaggerFile));
       app.use("/api/v1/webhooks", routesWebhooks);

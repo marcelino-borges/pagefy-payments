@@ -1,4 +1,4 @@
-import { getPackageJson } from "../config/package-json";
+import { getPackageJson } from "@/config/package-json";
 import {
   userModel,
   errorModel,

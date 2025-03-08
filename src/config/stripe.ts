@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import log from "../utils/logs";
+import log from "@/utils/logs";
 
 const initializeStripe = () => {
   let stripe: Stripe | null = null;

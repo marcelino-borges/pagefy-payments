@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import log from "../utils/logs";
+import log from "@/utils/logs";
 
 export const getLatestVersionFromChangelog = async (): Promise<any> => {
   const CHANGELOG_PATH = "./changelog.md";

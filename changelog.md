@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.13.0] - 2025-03-08
+
+- Feat: Stripe webhooks implemented
+
 ### [0.12.0] - 2025-03-05
 
 - Feat: new endpoint to retrieve a plan by its ID

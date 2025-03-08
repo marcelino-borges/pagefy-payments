@@ -1,4 +1,4 @@
-import { PlansTypes } from "../../models/user.models";
+import { PlansTypes } from "@/models/user.models";
 
 export const getPriceIdByRecurrencyAndPlanType = (
   recurrency: "month" | "year",

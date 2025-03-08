@@ -1,6 +1,6 @@
 import { HttpStatusCode } from "axios";
 import { AppError } from "../app-error";
-import { AppErrorsMessages } from "../../constants";
+import { AppErrorsMessages } from "@/constants";
 
 class AppResult {
   public readonly message: string;
@@ -10,7 +10,7 @@ class AppResult {
   constructor(
     message: string,
     errorDetails: string | null = null,
-    statusCode: number = 400
+    statusCode: number = HttpStatusCode.BadRequest
   ) {
     this.message = message;
     this.errorDetails = errorDetails;

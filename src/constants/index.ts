@@ -1,6 +1,7 @@
 export enum AppErrorsMessages {
   EMAIL_REQUIRED = "Email requiied.",
   NOT_AUTHORIZED = "Not authorized.",
+  FORBIDDEN = "Forbidden.",
   NO_TOKEN_PROVIDED = "No token provided.",
   USER_NOT_FOUND = "User not found.",
   USERID_OR_EMAIL_REQUIRED = "UserID or user email are required.",
@@ -18,6 +19,7 @@ export enum AppErrorsMessages {
   INVOICE_ID_REQUIRED = "InvoiceId required.",
   SUBSCRIPTION_ID_REQUIRED = "SubscriptionId required.",
   PLAN_ID_REQUIRED = "PlanId required.",
+  CREATE_CHECKOUT_SESSION = "Error creating checkout session.",
 }
 
 export const SYSTEM_EMAIL_CREDENTIALS = {

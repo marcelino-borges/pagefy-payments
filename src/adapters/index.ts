@@ -1,7 +1,7 @@
 import { HttpStatusCode } from "axios";
-import { AppErrorsMessages } from "../constants";
-import { AppError } from "../utils/app-error";
-import stripe from "../config/stripe";
+import { AppErrorsMessages } from "@/constants";
+import { AppError } from "@/utils/app-error";
+import stripe from "@/config/stripe";
 
 export const buildStripeEvent = (requestBody: any, signatureHeader: string) => {
   if (!stripe) {

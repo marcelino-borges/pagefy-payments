@@ -46,6 +46,7 @@
     "@typescript-eslint/parser": "^3.8.0",
     "prettier": "^2.7.1",
     "swagger-autogen": "^2.22.0",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.8.2"
   }
 }

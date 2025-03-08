@@ -1,9 +1,9 @@
 import SMTPTransport from "nodemailer/lib/smtp-transport";
 import nodemailer from "nodemailer";
-import { IEmailRecipient } from "../models/email.models";
-import { SYSTEM_EMAIL_CREDENTIALS } from "../constants";
-import { NOREPLY_EMAIL } from "./../constants";
-import log from "../utils/logs";
+import { IEmailRecipient } from "@/models/email.models";
+import { SYSTEM_EMAIL_CREDENTIALS } from "@/constants";
+import { NOREPLY_EMAIL } from "@/constants";
+import log from "@/utils/logs";
 
 export const sendEmailToUser = async (userRecipient: IEmailRecipient) => {
   const { name, email, subject, messageHTML, messagePlainText } = userRecipient;
