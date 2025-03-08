@@ -6,9 +6,11 @@ import stripe from "@/config/stripe";
 import { AppError } from "@/utils/app-error";
 import { Invoice } from "@/models/stripe/invoice.models";
 import { Session } from "@/models/stripe/session.models";
-import { checkoutDB } from "@/models/stripe/checkout.models";
+import { checkoutDB } from "@/models/checkout.models";
 import log from "@/utils/logs";
 import { buildStripeClientError } from "@/utils";
+import { Subscription } from "@/models/stripe/subscription.models";
+import { Plan } from "@/models/stripe/plan.models";
 
 export const getAllPlans = async () => {
   if (!stripe) throw buildStripeClientError("Services.Stripe.getAllPlans");
@@ -260,7 +262,13 @@ export const getExpandedCheckoutSessionByIdOnStripe = async (
     ],
   });
 
-  return session;
+  const productId = (
+    (session.subscription as Subscription).items.data[0].plan as Plan
+  ).product;
+
+  const product = await stripe.products.retrieve(productId);
+
+  return { ...session, product };
 };
 
 export const getSubscriptionByIdOnStripe = async (subscriptionId: string) => {

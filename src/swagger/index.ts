@@ -5,6 +5,7 @@ import {
   planModel,
   checkoutModel,
   invoiceModel,
+  subscriptionModel,
 } from "./models";
 
 import swaggerAutogen from "swagger-autogen";
@@ -32,6 +33,8 @@ export const runSwaggerAutogen = async (apiVersion: string) => {
       Plans: [planModel],
       Checkout: checkoutModel,
       Invoice: invoiceModel,
+      Subscription: subscriptionModel,
+      Subscriptions: [subscriptionModel],
     },
   };
 

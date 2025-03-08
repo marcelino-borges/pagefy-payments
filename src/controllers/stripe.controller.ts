@@ -263,7 +263,7 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
       type: 'string'
     }
     #swagger.responses[200] = {
-      description: 'Subscription created'
+      description: 'Subscription canceled'
     }
     #swagger.responses[400] = {
       schema: { $ref: "#/definitions/Error" },
@@ -307,8 +307,8 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
 export const getSubsctriptionById = async (req: Request, res: Response) => {
   /* 
     #swagger.tags = ['Subscription']
-    #swagger.summary = 'Gets a subscriptions by ID from Stripe'
-    #swagger.description  = 'Gets a subscriptions by ID from Stripe'
+    #swagger.summary = 'Gets a subscription by ID from Stripe'
+    #swagger.description  = 'Gets a subscription by ID from Stripe'
     #swagger.parameters['subscriptionId'] = {
       in: 'params',
       description: 'Subscription ID',
@@ -317,6 +317,7 @@ export const getSubsctriptionById = async (req: Request, res: Response) => {
     }
     #swagger.responses[200] = {
       description: 'Subscription from Stripe'
+      schema: { $ref: "#/definitions/Subscription" },
     }
     #swagger.responses[400] = {
       schema: { $ref: "#/definitions/Error" },

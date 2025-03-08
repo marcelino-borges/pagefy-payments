@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { checkoutDB } from "@/models/stripe/checkout.models";
+import { checkoutDB } from "@/models/checkout.models";
 import { Session } from "@/models/stripe/session.models";
 import log from "@/utils/logs";
 import { getUserByEmailThroughApiKey } from "@/services/user.service";
@@ -31,8 +31,9 @@ export const handleCheckoutSessionComplete = async (
     checkoutSession.id as string
   );
 
-  const { invoice, subscription, customer, ...basicSession } =
+  const { invoice, subscription, customer, product, ...basicSession } =
     sessionFound as any;
+
   const sessionToSave = {
     ...basicSession,
     customer: customer.id,
@@ -52,8 +53,10 @@ export const handleCheckoutSessionComplete = async (
       subscription: subscription ?? null,
       invoice: basicInvoice ?? null,
       charge: charge ?? null,
-      plan: subscription.items.data.plan ?? null,
+      plan: subscription.items.data[0].plan ?? null,
+      price: subscription.items.data[0].price ?? null,
       customer: customer ?? null,
+      product: product ?? null,
     },
     {
       new: true,
