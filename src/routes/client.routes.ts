@@ -5,6 +5,8 @@ import {
   getSubsctriptionsByUserId,
   getUserActiveSubscription,
 } from "@/controllers/checkouts.controller";
+import { verifyApiKey } from "@/middlewares/api-key.middleware";
+import { getAllPlansFeatures } from "@/controllers/plans-features.service";
 
 const router = express.Router();
 
@@ -45,5 +47,11 @@ router.get(
   verifyToken,
   getUserActiveSubscription
 );
+
+/*
+ * SYSTEM ROUTES (VIA API KEY)
+ */
+
+router.get("/system/plans-features", verifyApiKey, getAllPlansFeatures);
 
 export default router;

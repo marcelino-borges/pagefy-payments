@@ -1,8 +1,9 @@
 export enum AppErrorsMessages {
   EMAIL_REQUIRED = "Email requiied.",
-  NOT_AUTHORIZED = "Not authorized.",
+  UNAUTHORIZED = "Not authorized.",
   FORBIDDEN = "Forbidden.",
   NO_TOKEN_PROVIDED = "No token provided.",
+  NO_API_KEY_PROVIDED = "No api key provided.",
   USER_NOT_FOUND = "User not found.",
   USERID_OR_EMAIL_REQUIRED = "UserID or user email are required.",
   MISSING_PROPS = "Props missing.",

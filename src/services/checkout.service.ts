@@ -1,5 +1,5 @@
 import { adaptCheckoutToUserSubscription } from "@/adapters";
-import { checkoutDB, UserSubscription } from "@/models/checkout.models";
+import { checkoutModel, UserSubscription } from "@/models/checkout.models";
 import {
   Subscription,
   SubscriptionStatus,
@@ -9,7 +9,7 @@ import { HttpStatusCode } from "axios";
 
 export const getSubsctriptionsByUserId = async (userId: string) => {
   try {
-    const checkouts = await checkoutDB
+    const checkouts = await checkoutModel
       .find({
         userId,
         subscription: {
@@ -38,7 +38,7 @@ export const getSubsctriptionsByUserId = async (userId: string) => {
 
 export const getUserActiveSubscription = async (userId: string) => {
   try {
-    const checkouts = await checkoutDB
+    const checkouts = await checkoutModel
       .find({
         userId,
         "subscription.status": SubscriptionStatus.ACTIVE,
@@ -61,7 +61,7 @@ export const updateSubscriptionFromWebhook = async (
   subscription: Subscription
 ) => {
   try {
-    const checkout = await checkoutDB.findOneAndUpdate(
+    const checkout = await checkoutModel.findOneAndUpdate(
       {
         "subscription.id": subscription.id,
       },

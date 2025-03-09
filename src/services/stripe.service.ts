@@ -6,7 +6,7 @@ import stripe from "@/config/stripe";
 import { AppError } from "@/utils/app-error";
 import { Invoice } from "@/models/stripe/invoice.models";
 import { Session } from "@/models/stripe/session.models";
-import { checkoutDB } from "@/models/checkout.models";
+import { checkoutModel } from "@/models/checkout.models";
 import log from "@/utils/logs";
 import { buildStripeClientError } from "@/utils";
 import { Subscription } from "@/models/stripe/subscription.models";
@@ -134,7 +134,7 @@ export const createCheckoutSession = async (
   });
 
   try {
-    await checkoutDB.create({
+    await checkoutModel.create({
       userId: new Types.ObjectId(userId),
       session: newSession,
     });
@@ -308,7 +308,7 @@ export const cancelSubscriptionOnStripe = async (
     throw buildStripeClientError("Services.Stripe.cancelSubscriptionOnStripe");
 
   try {
-    const checkout = await checkoutDB.findOne({
+    const checkout = await checkoutModel.findOne({
       userId,
       "subscription.id": subscriptionId,
     });

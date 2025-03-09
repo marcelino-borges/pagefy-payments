@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.15.0] - 2025-03-09
+
+- Feat: new model PlanFeatures with a GET endpoint and seed by npm script
+
 ### [0.14.0] - 2025-03-09
 
 - Feat: endpoint to get user's active subscription

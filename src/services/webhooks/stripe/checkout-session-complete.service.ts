@@ -1,5 +1,5 @@
 import Stripe from "stripe";
-import { checkoutDB } from "@/models/checkout.models";
+import { checkoutModel } from "@/models/checkout.models";
 import { Session } from "@/models/stripe/session.models";
 import log from "@/utils/logs";
 import { getUserByEmailThroughApiKey } from "@/services/user.service";
@@ -43,7 +43,7 @@ export const handleCheckoutSessionComplete = async (
 
   const { charge, ...basicInvoice } = invoice;
 
-  const updated = await checkoutDB.findOneAndUpdate(
+  const updated = await checkoutModel.findOneAndUpdate(
     {
       "session.id": checkoutSession.id,
       userId: userFound._id,

@@ -35,7 +35,7 @@ export const verifyToken = async (req: Request, res: Response, next: any) => {
         .status(HttpStatusCode.Unauthorized)
         .json(
           new AppResult(
-            AppErrorsMessages.NOT_AUTHORIZED,
+            AppErrorsMessages.UNAUTHORIZED,
             AppErrorsMessages.USER_NOT_FOUND,
             HttpStatusCode.Unauthorized
           )
@@ -55,7 +55,7 @@ export const verifyToken = async (req: Request, res: Response, next: any) => {
       .status(HttpStatusCode.Unauthorized)
       .json(
         new AppResult(
-          AppErrorsMessages.NOT_AUTHORIZED,
+          AppErrorsMessages.UNAUTHORIZED,
           (error as Error).message,
           HttpStatusCode.Unauthorized
         )

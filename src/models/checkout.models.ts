@@ -61,4 +61,4 @@ const checkoutSchema = new Schema<Checkout>(
   }
 );
 
-export const checkoutDB = model<Checkout>("checkouts", checkoutSchema);
+export const checkoutModel = model<Checkout>("checkouts", checkoutSchema);
