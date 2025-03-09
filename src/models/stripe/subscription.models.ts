@@ -2,6 +2,17 @@ import { Schema } from "mongoose";
 import { Plan } from "./plan.models";
 import { Price } from "./price.models";
 
+export enum SubscriptionStatus {
+  INCOMPLETE = "incomplete",
+  INCOMPLETE_EXPIRED = "incomplete_expired",
+  TRIALING = "trialing",
+  ACTIVE = "active",
+  PAST_DUE = "past_due",
+  CANCELED = "canceled",
+  UNPAID = "unpaid",
+  PAUSED = "paused",
+}
+
 export interface Subscription {
   id: string;
   object: "subscription";

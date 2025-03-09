@@ -1,7 +1,10 @@
 import * as express from "express";
 import * as stripeController from "@/controllers/stripe.controller";
 import { verifyToken } from "@/middlewares/auth.middleware";
-import { getSubsctriptionsByUserId } from "@/controllers/checkouts.controller";
+import {
+  getSubsctriptionsByUserId,
+  getUserActiveSubscription,
+} from "@/controllers/checkouts.controller";
 
 const router = express.Router();
 
@@ -35,6 +38,12 @@ router.get(
   "/subscription/user/:userId",
   verifyToken,
   getSubsctriptionsByUserId
+);
+
+router.get(
+  "/subscription/active/user/:userId",
+  verifyToken,
+  getUserActiveSubscription
 );
 
 export default router;
