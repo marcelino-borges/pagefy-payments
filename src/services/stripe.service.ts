@@ -300,9 +300,32 @@ export const getExpandedSubscriptionByIdOnStripe = async (
   return subscription;
 };
 
-export const cancelSubscriptionOnStripe = async (subscriptionId: string) => {
+export const cancelSubscriptionOnStripe = async (
+  subscriptionId: string,
+  userId: string
+) => {
   if (!stripe)
     throw buildStripeClientError("Services.Stripe.cancelSubscriptionOnStripe");
 
-  await stripe.subscriptions.cancel(subscriptionId);
+  try {
+    const checkout = await checkoutDB.findOne({
+      userId,
+      "subscription.id": subscriptionId,
+    });
+
+    if (!checkout) {
+      throw new AppError(
+        "Subscription not found for this user.",
+        HttpStatusCode.BadRequest
+      );
+    }
+
+    await stripe.subscriptions.cancel(subscriptionId);
+  } catch (error) {
+    throw new AppError(
+      "Error canceling subscription.",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
+  }
 };

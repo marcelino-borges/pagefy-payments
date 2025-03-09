@@ -8,6 +8,7 @@ import { HttpStatusCode } from "axios";
 import { buildStripeEvent } from "@/adapters";
 import { handleCheckoutSessionComplete } from "@/services/webhooks/stripe/checkout-session-complete.service";
 import { handleCustomerCreated } from "@/services/webhooks/stripe/customer-created.service";
+import { handleSubscriptionDeleted } from "@/services/webhooks/stripe/subscription-deleted.service";
 
 export const getAllPlans = async (_: Request, res: Response) => {
   /* 
@@ -274,7 +275,8 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
       description: 'Message of error'
     }
   */
-  const { subscriptionId } = req.params;
+  const { subscriptionId } = req.body;
+  const userId = (req as any).userId;
 
   if (!subscriptionId) {
     res
@@ -290,7 +292,7 @@ export const cancelSubsctription = async (req: Request, res: Response) => {
   }
 
   try {
-    await stripeService.cancelSubscriptionOnStripe(subscriptionId);
+    await stripeService.cancelSubscriptionOnStripe(subscriptionId, userId);
 
     res
       .status(HttpStatusCode.Ok)
@@ -399,6 +401,12 @@ export const hookEventsFromStripe = async (req: Request, res: Response) => {
       console.log(`🔔 Received event [customer.created][${event.id}]`);
       console.table(event);
       handleCustomerCreated(event.data.object);
+    } else if (event.type === "customer.subscription.deleted") {
+      console.log(
+        `🔔 Received event [customer.subscription.deleted][${event.id}]`
+      );
+      console.table(event);
+      handleSubscriptionDeleted(event.data.object);
     }
 
     res.send(new AppResult("Webhook received", null, HttpStatusCode.Ok));

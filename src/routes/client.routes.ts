@@ -20,7 +20,7 @@ router.get(
 router.get("/invoice/:invoiceId", stripeController.getInvoiceById);
 
 router.patch(
-  "/subscription/cancel/:subscriptionId",
+  "/subscription/cancel",
   verifyToken,
   stripeController.cancelSubsctription
 );

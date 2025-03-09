@@ -26,7 +26,7 @@ export interface Checkout {
   updatedAt: Date;
 }
 
-export interface UserSubscriptions {
+export interface UserSubscription {
   subscriptionId: string;
   isActive: boolean;
   interval: string;
@@ -38,6 +38,10 @@ export interface UserSubscriptions {
   planImageUrl: string;
   invoiceOnlineUrl: string;
   invoiceDownloadPdf: string;
+  willCancelAt: Date | null;
+  canceledAt: Date | null;
+  currentPeriodStart: Date;
+  currentPeriodEnd: Date;
 }
 
 const checkoutSchema = new Schema<Checkout>(

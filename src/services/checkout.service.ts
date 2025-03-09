@@ -1,6 +1,10 @@
-import { checkoutDB, UserSubscriptions } from "@/models/checkout.models";
+import { adaptCheckoutToUserSubscription } from "@/adapters";
+import { checkoutDB, UserSubscription } from "@/models/checkout.models";
 import { Plan } from "@/models/stripe/plan.models";
+import { Subscription } from "@/models/stripe/subscription.models";
 import { AppError } from "@/utils/app-error";
+import { HttpStatusCode } from "axios";
+import Stripe from "stripe";
 
 export const getSubsctriptionsByUserId = async (userId: string) => {
   try {
@@ -21,22 +25,40 @@ export const getSubsctriptionsByUserId = async (userId: string) => {
         updatedAt: "asc",
       });
 
-    const remapped = checkouts.map((checkout) => ({
-      subscriptionId: checkout.subscription!.id,
-      isActive: checkout.subscription!.status === "active",
-      interval: (checkout.subscription!.items.data[0].plan as Plan).interval,
-      currency: checkout.session.currency,
-      onlineReceiptUrl: checkout.charge!.receipt_url,
-      price: checkout.charge!.amount_captured,
-      captureDate: new Date(checkout.charge!.created * 100),
-      planName: checkout.product!.name,
-      planImageUrl: checkout.product!.images[0],
-      invoiceOnlineUrl: checkout.invoice!.hosted_invoice_url,
-      invoiceDownloadPdf: checkout.invoice!.invoice_pdf,
-    }));
+    const adaptedToUserSubscription = checkouts.map((checkout) =>
+      adaptCheckoutToUserSubscription(checkout)
+    );
 
-    return remapped as UserSubscriptions[];
+    return adaptedToUserSubscription as UserSubscription[];
   } catch (error) {
     throw new AppError("Error finding subscriptions.");
+  }
+};
+
+export const updateSubscriptionFromWebhook = async (
+  subscription: Subscription
+) => {
+  try {
+    const checkout = await checkoutDB.findOneAndUpdate(
+      {
+        "subscription.id": subscription.id,
+      },
+      {
+        subscription,
+      },
+      {
+        new: true,
+      }
+    );
+
+    if (!checkout) {
+      throw new AppError("Subscription not found.", HttpStatusCode.BadRequest);
+    }
+  } catch (error) {
+    throw new AppError(
+      "Error updating subscription.",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
   }
 };
