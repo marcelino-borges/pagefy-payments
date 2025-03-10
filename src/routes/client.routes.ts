@@ -54,4 +54,10 @@ router.get(
 
 router.get("/system/plans-features", verifyApiKey, getAllPlansFeatures);
 
+router.get(
+  "/system/subscription/user/:userId",
+  verifyApiKey,
+  getSubsctriptionsByUserId
+);
+
 export default router;

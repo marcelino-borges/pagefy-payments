@@ -38,6 +38,14 @@ class AppResult {
       HttpStatusCode.InternalServerError
     );
   }
+
+  public static buildForbidden(forbiddenDetails?: string) {
+    return new AppResult(
+      AppErrorsMessages.FORBIDDEN,
+      forbiddenDetails,
+      HttpStatusCode.Forbidden
+    );
+  }
 }
 
 export default AppResult;

@@ -92,6 +92,16 @@ export const getUserActiveSubscription = async (
     }
   */
   const { userId } = req.params;
+  const tokenUserId = (req as any).userId;
+
+  if (userId !== tokenUserId) {
+    const result = AppResult.buildForbidden(
+      "Attempt to access another user's data."
+    );
+
+    res.status(result.statusCode).json(result);
+    return;
+  }
 
   if (!userId) {
     res
