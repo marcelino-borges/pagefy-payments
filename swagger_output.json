@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "version": "0.11.0",
+    "version": "0.17.0",
     "title": "REST API",
     "description": ""
   },
@@ -14,483 +14,88 @@
     "application/json"
   ],
   "paths": {
-    "/plans": {
-      "get": {
-        "tags": [
-          "Plans"
-        ],
-        "summary": "Gets all plans",
-        "description": "Gets all plans",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "List of plans with its prices",
-            "schema": {
-              "$ref": "#/definitions/Plans"
-            }
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          },
-          "500": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      }
-    },
     "/plans/{planId}": {
       "get": {
-        "tags": [
-          "Plans"
-        ],
-        "summary": "Gets all plans",
-        "description": "Gets all plans",
-        "parameters": [
-          {
-            "name": "planId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "List of plans with its prices",
-            "schema": {
-              "$ref": "#/definitions/Plans"
-            }
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          },
-          "500": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/plans": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
     "/checkout": {
       "post": {
-        "tags": [
-          "Checkout"
-        ],
-        "summary": "Creates a new checkout session",
-        "description": "Creates a new checkout session",
-        "parameters": [
-          {
-            "name": "priceId",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "schema": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                }
-              }
-            },
-            "description": "ID of the price in Stripe",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "New Stripe session",
-            "schema": {
-              "$ref": "#/definitions/Checkout"
-            }
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          }
-        }
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
     "/checkout/session/{sessionId}": {
       "get": {
-        "tags": [
-          "Checkout"
-        ],
-        "summary": "Gets a checkout session by ID",
-        "description": "Gets a checkout session by ID",
-        "parameters": [
-          {
-            "name": "sessionId",
-            "in": "params",
-            "required": true,
-            "type": "string",
-            "description": "ID of the checkout session in Stripe"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "New Stripe session",
-            "schema": {
-              "$ref": "#/definitions/Checkout"
-            }
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          }
-        }
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
     "/invoice/{invoiceId}": {
       "get": {
-        "tags": [
-          "Invoice"
-        ],
-        "summary": "Gets an invoice by ID",
-        "description": "Gets an invoice by ID",
-        "parameters": [
-          {
-            "name": "invoiceId",
-            "in": "params",
-            "required": true,
-            "type": "string",
-            "description": "ID of the invoice in Stripe"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Invoice in Stripe",
-            "schema": {
-              "$ref": "#/definitions/Invoice"
-            }
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          }
-        }
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
     "/subscription/cancel": {
       "patch": {
-        "tags": [
-          "Subscription"
-        ],
-        "summary": "Marks a subscription to be cancelled by the end of the current period",
-        "description": "Marks a subscription to be cancelled by the end of the current period",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "subscriptionId",
-            "in": "params",
-            "description": "ID of the subscription in Stripe",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "schema": {
-                  "example": "any"
-                },
-                "description": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success marking the subscription to be cancelled"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          }
-        }
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
-    "/subscription": {
-      "post": {
-        "tags": [
-          "Subscription"
-        ],
-        "summary": "Creates a new subscription for a given user",
-        "description": "Creates a new subscription for a given user",
-        "parameters": [
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "currency",
-            "in": "body",
-            "description": "User currency",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          },
-          {
-            "name": "recurrency",
-            "in": "body",
-            "description": "month or year",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {}
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Subscription created"
-          },
-          "400": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      }
-    },
-    "/subscription/cancel/{subscriptionId}": {
-      "put": {
-        "tags": [
-          "Subscription"
-        ],
-        "summary": "Cancels a subscription",
-        "description": "Cancels a subscription",
-        "parameters": [
-          {
-            "name": "subscriptionId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "subscriptionId",
-            "in": "params",
-            "required": true,
-            "type": "string",
-            "description": "Subscription ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Subscription created"
-          },
-          "400": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
-      }
-    },
-    "/subscription/paymentintent/{paymentIntentId}": {
+    "/subscription/{subscriptionId}": {
       "get": {
-        "tags": [
-          "Subscription"
-        ],
-        "summary": "Gets a payment intent from a subscription",
-        "description": "Gets a payment intent from a subscription",
-        "parameters": [
-          {
-            "name": "paymentIntentId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "paymentIntentId",
-            "in": "query",
-            "required": true,
-            "type": "string",
-            "description": "Payment Intent ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Subscription created"
-          },
-          "400": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
     "/subscription/user/{userId}": {
       "get": {
-        "tags": [
-          "Subscription"
-        ],
-        "summary": "Gets all subscriptions belonging to an user",
-        "description": "Gets all subscriptions belonging to an user",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          },
-          {
-            "name": "userId",
-            "in": "params",
-            "required": true,
-            "type": "string",
-            "description": "User ID"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Subscription created"
-          },
-          "400": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "500": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/subscription/active/user/{userId}": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/system/plans-features": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
+      }
+    },
+    "/system/subscription/user/{userId}": {
+      "get": {
+        "description": "",
+        "parameters": [],
+        "responses": {}
       }
     },
     "/stripe": {
       "post": {
-        "tags": [
-          "Webhooks"
-        ],
-        "summary": "Receives webhook events from Stripe",
-        "description": "Receives webhook events from Stripe",
+        "description": "",
         "parameters": [],
-        "responses": {
-          "200": {
-            "description": "Subscription created"
-          },
-          "400": {
-            "schema": {
-              "$ref": "#/definitions/Error"
-            },
-            "description": "Message of error"
-          },
-          "500": {
-            "description": "Message of error",
-            "schema": {
-              "$ref": "#/definitions/Error"
-            }
-          }
-        }
+        "responses": {}
       }
     }
   },
@@ -1622,6 +1227,723 @@
         "webhooks_delivered_at": {
           "type": "number",
           "example": 1741215680
+        }
+      }
+    },
+    "Subscription": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "example": "sub_1MowQVLkdIwHu7ixeRlqHVzs"
+        },
+        "object": {
+          "type": "string",
+          "example": "subscription"
+        },
+        "application": {},
+        "application_fee_percent": {},
+        "automatic_tax": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "example": false
+            },
+            "liability": {}
+          }
+        },
+        "billing_cycle_anchor": {
+          "type": "number",
+          "example": 1679609767
+        },
+        "billing_thresholds": {},
+        "cancel_at": {},
+        "cancel_at_period_end": {
+          "type": "boolean",
+          "example": false
+        },
+        "canceled_at": {},
+        "cancellation_details": {
+          "type": "object",
+          "properties": {
+            "comment": {},
+            "feedback": {},
+            "reason": {}
+          }
+        },
+        "collection_method": {
+          "type": "string",
+          "example": "charge_automatically"
+        },
+        "created": {
+          "type": "number",
+          "example": 1679609767
+        },
+        "currency": {
+          "type": "string",
+          "example": "usd"
+        },
+        "current_period_end": {
+          "type": "number",
+          "example": 1682288167
+        },
+        "current_period_start": {
+          "type": "number",
+          "example": 1679609767
+        },
+        "customer": {
+          "type": "string",
+          "example": "cus_Na6dX7aXxi11N4"
+        },
+        "days_until_due": {},
+        "default_payment_method": {},
+        "default_source": {},
+        "default_tax_rates": {
+          "type": "array",
+          "example": [],
+          "items": {}
+        },
+        "description": {},
+        "discount": {},
+        "discounts": {},
+        "ended_at": {},
+        "invoice_settings": {
+          "type": "object",
+          "properties": {
+            "issuer": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "example": "self"
+                }
+              }
+            }
+          }
+        },
+        "items": {
+          "type": "object",
+          "properties": {
+            "object": {
+              "type": "string",
+              "example": "list"
+            },
+            "data": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "example": "si_Na6dzxczY5fwHx"
+                  },
+                  "object": {
+                    "type": "string",
+                    "example": "subscription_item"
+                  },
+                  "billing_thresholds": {},
+                  "created": {
+                    "type": "number",
+                    "example": 1679609768
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "properties": {}
+                  },
+                  "plan": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "price_1MowQULkdIwHu7ixraBm864M"
+                      },
+                      "object": {
+                        "type": "string",
+                        "example": "plan"
+                      },
+                      "active": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "aggregate_usage": {},
+                      "amount": {
+                        "type": "number",
+                        "example": 1000
+                      },
+                      "amount_decimal": {
+                        "type": "string",
+                        "example": "1000"
+                      },
+                      "billing_scheme": {
+                        "type": "string",
+                        "example": "per_unit"
+                      },
+                      "created": {
+                        "type": "number",
+                        "example": 1679609766
+                      },
+                      "currency": {
+                        "type": "string",
+                        "example": "usd"
+                      },
+                      "discounts": {},
+                      "interval": {
+                        "type": "string",
+                        "example": "month"
+                      },
+                      "interval_count": {
+                        "type": "number",
+                        "example": 1
+                      },
+                      "livemode": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "metadata": {
+                        "type": "object",
+                        "properties": {}
+                      },
+                      "nickname": {},
+                      "product": {
+                        "type": "string",
+                        "example": "prod_Na6dGcTsmU0I4R"
+                      },
+                      "tiers_mode": {},
+                      "transform_usage": {},
+                      "trial_period_days": {},
+                      "usage_type": {
+                        "type": "string",
+                        "example": "licensed"
+                      }
+                    }
+                  },
+                  "price": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "price_1MowQULkdIwHu7ixraBm864M"
+                      },
+                      "object": {
+                        "type": "string",
+                        "example": "price"
+                      },
+                      "active": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "billing_scheme": {
+                        "type": "string",
+                        "example": "per_unit"
+                      },
+                      "created": {
+                        "type": "number",
+                        "example": 1679609766
+                      },
+                      "currency": {
+                        "type": "string",
+                        "example": "usd"
+                      },
+                      "custom_unit_amount": {},
+                      "livemode": {
+                        "type": "boolean",
+                        "example": false
+                      },
+                      "lookup_key": {},
+                      "metadata": {
+                        "type": "object",
+                        "properties": {}
+                      },
+                      "nickname": {},
+                      "product": {
+                        "type": "string",
+                        "example": "prod_Na6dGcTsmU0I4R"
+                      },
+                      "recurring": {
+                        "type": "object",
+                        "properties": {
+                          "aggregate_usage": {},
+                          "interval": {
+                            "type": "string",
+                            "example": "month"
+                          },
+                          "interval_count": {
+                            "type": "number",
+                            "example": 1
+                          },
+                          "trial_period_days": {},
+                          "usage_type": {
+                            "type": "string",
+                            "example": "licensed"
+                          }
+                        }
+                      },
+                      "tax_behavior": {
+                        "type": "string",
+                        "example": "unspecified"
+                      },
+                      "tiers_mode": {},
+                      "transform_quantity": {},
+                      "type": {
+                        "type": "string",
+                        "example": "recurring"
+                      },
+                      "unit_amount": {
+                        "type": "number",
+                        "example": 1000
+                      },
+                      "unit_amount_decimal": {
+                        "type": "string",
+                        "example": "1000"
+                      }
+                    }
+                  },
+                  "quantity": {
+                    "type": "number",
+                    "example": 1
+                  },
+                  "subscription": {
+                    "type": "string",
+                    "example": "sub_1MowQVLkdIwHu7ixeRlqHVzs"
+                  },
+                  "tax_rates": {
+                    "type": "array",
+                    "example": [],
+                    "items": {}
+                  }
+                }
+              }
+            },
+            "has_more": {
+              "type": "boolean",
+              "example": false
+            },
+            "total_count": {
+              "type": "number",
+              "example": 1
+            },
+            "url": {
+              "type": "string",
+              "example": "/v1/subscription_items?subscription=sub_1MowQVLkdIwHu7ixeRlqHVzs"
+            }
+          }
+        },
+        "latest_invoice": {
+          "type": "string",
+          "example": "in_1MowQWLkdIwHu7ixuzkSPfKd"
+        },
+        "livemode": {
+          "type": "boolean",
+          "example": false
+        },
+        "metadata": {
+          "type": "object",
+          "properties": {}
+        },
+        "next_pending_invoice_item_invoice": {},
+        "on_behalf_of": {},
+        "pause_collection": {},
+        "payment_settings": {
+          "type": "object",
+          "properties": {
+            "payment_method_options": {},
+            "payment_method_types": {},
+            "save_default_payment_method": {
+              "type": "string",
+              "example": "off"
+            }
+          }
+        },
+        "pending_invoice_item_interval": {},
+        "pending_setup_intent": {},
+        "pending_update": {},
+        "schedule": {},
+        "start_date": {
+          "type": "number",
+          "example": 1679609767
+        },
+        "status": {
+          "type": "string",
+          "example": "active"
+        },
+        "test_clock": {},
+        "transfer_data": {},
+        "trial_end": {},
+        "trial_settings": {
+          "type": "object",
+          "properties": {
+            "end_behavior": {
+              "type": "object",
+              "properties": {
+                "missing_payment_method": {
+                  "type": "string",
+                  "example": "create_invoice"
+                }
+              }
+            }
+          }
+        },
+        "trial_start": {}
+      }
+    },
+    "Subscriptions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "sub_1MowQVLkdIwHu7ixeRlqHVzs"
+          },
+          "object": {
+            "type": "string",
+            "example": "subscription"
+          },
+          "application": {},
+          "application_fee_percent": {},
+          "automatic_tax": {
+            "type": "object",
+            "properties": {
+              "enabled": {
+                "type": "boolean",
+                "example": false
+              },
+              "liability": {}
+            }
+          },
+          "billing_cycle_anchor": {
+            "type": "number",
+            "example": 1679609767
+          },
+          "billing_thresholds": {},
+          "cancel_at": {},
+          "cancel_at_period_end": {
+            "type": "boolean",
+            "example": false
+          },
+          "canceled_at": {},
+          "cancellation_details": {
+            "type": "object",
+            "properties": {
+              "comment": {},
+              "feedback": {},
+              "reason": {}
+            }
+          },
+          "collection_method": {
+            "type": "string",
+            "example": "charge_automatically"
+          },
+          "created": {
+            "type": "number",
+            "example": 1679609767
+          },
+          "currency": {
+            "type": "string",
+            "example": "usd"
+          },
+          "current_period_end": {
+            "type": "number",
+            "example": 1682288167
+          },
+          "current_period_start": {
+            "type": "number",
+            "example": 1679609767
+          },
+          "customer": {
+            "type": "string",
+            "example": "cus_Na6dX7aXxi11N4"
+          },
+          "days_until_due": {},
+          "default_payment_method": {},
+          "default_source": {},
+          "default_tax_rates": {
+            "type": "array",
+            "example": [],
+            "items": {}
+          },
+          "description": {},
+          "discount": {},
+          "discounts": {},
+          "ended_at": {},
+          "invoice_settings": {
+            "type": "object",
+            "properties": {
+              "issuer": {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "example": "self"
+                  }
+                }
+              }
+            }
+          },
+          "items": {
+            "type": "object",
+            "properties": {
+              "object": {
+                "type": "string",
+                "example": "list"
+              },
+              "data": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "example": "si_Na6dzxczY5fwHx"
+                    },
+                    "object": {
+                      "type": "string",
+                      "example": "subscription_item"
+                    },
+                    "billing_thresholds": {},
+                    "created": {
+                      "type": "number",
+                      "example": 1679609768
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "properties": {}
+                    },
+                    "plan": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "price_1MowQULkdIwHu7ixraBm864M"
+                        },
+                        "object": {
+                          "type": "string",
+                          "example": "plan"
+                        },
+                        "active": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "aggregate_usage": {},
+                        "amount": {
+                          "type": "number",
+                          "example": 1000
+                        },
+                        "amount_decimal": {
+                          "type": "string",
+                          "example": "1000"
+                        },
+                        "billing_scheme": {
+                          "type": "string",
+                          "example": "per_unit"
+                        },
+                        "created": {
+                          "type": "number",
+                          "example": 1679609766
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "usd"
+                        },
+                        "discounts": {},
+                        "interval": {
+                          "type": "string",
+                          "example": "month"
+                        },
+                        "interval_count": {
+                          "type": "number",
+                          "example": 1
+                        },
+                        "livemode": {
+                          "type": "boolean",
+                          "example": false
+                        },
+                        "metadata": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "nickname": {},
+                        "product": {
+                          "type": "string",
+                          "example": "prod_Na6dGcTsmU0I4R"
+                        },
+                        "tiers_mode": {},
+                        "transform_usage": {},
+                        "trial_period_days": {},
+                        "usage_type": {
+                          "type": "string",
+                          "example": "licensed"
+                        }
+                      }
+                    },
+                    "price": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string",
+                          "example": "price_1MowQULkdIwHu7ixraBm864M"
+                        },
+                        "object": {
+                          "type": "string",
+                          "example": "price"
+                        },
+                        "active": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "billing_scheme": {
+                          "type": "string",
+                          "example": "per_unit"
+                        },
+                        "created": {
+                          "type": "number",
+                          "example": 1679609766
+                        },
+                        "currency": {
+                          "type": "string",
+                          "example": "usd"
+                        },
+                        "custom_unit_amount": {},
+                        "livemode": {
+                          "type": "boolean",
+                          "example": false
+                        },
+                        "lookup_key": {},
+                        "metadata": {
+                          "type": "object",
+                          "properties": {}
+                        },
+                        "nickname": {},
+                        "product": {
+                          "type": "string",
+                          "example": "prod_Na6dGcTsmU0I4R"
+                        },
+                        "recurring": {
+                          "type": "object",
+                          "properties": {
+                            "aggregate_usage": {},
+                            "interval": {
+                              "type": "string",
+                              "example": "month"
+                            },
+                            "interval_count": {
+                              "type": "number",
+                              "example": 1
+                            },
+                            "trial_period_days": {},
+                            "usage_type": {
+                              "type": "string",
+                              "example": "licensed"
+                            }
+                          }
+                        },
+                        "tax_behavior": {
+                          "type": "string",
+                          "example": "unspecified"
+                        },
+                        "tiers_mode": {},
+                        "transform_quantity": {},
+                        "type": {
+                          "type": "string",
+                          "example": "recurring"
+                        },
+                        "unit_amount": {
+                          "type": "number",
+                          "example": 1000
+                        },
+                        "unit_amount_decimal": {
+                          "type": "string",
+                          "example": "1000"
+                        }
+                      }
+                    },
+                    "quantity": {
+                      "type": "number",
+                      "example": 1
+                    },
+                    "subscription": {
+                      "type": "string",
+                      "example": "sub_1MowQVLkdIwHu7ixeRlqHVzs"
+                    },
+                    "tax_rates": {
+                      "type": "array",
+                      "example": [],
+                      "items": {}
+                    }
+                  }
+                }
+              },
+              "has_more": {
+                "type": "boolean",
+                "example": false
+              },
+              "total_count": {
+                "type": "number",
+                "example": 1
+              },
+              "url": {
+                "type": "string",
+                "example": "/v1/subscription_items?subscription=sub_1MowQVLkdIwHu7ixeRlqHVzs"
+              }
+            }
+          },
+          "latest_invoice": {
+            "type": "string",
+            "example": "in_1MowQWLkdIwHu7ixuzkSPfKd"
+          },
+          "livemode": {
+            "type": "boolean",
+            "example": false
+          },
+          "metadata": {
+            "type": "object",
+            "properties": {}
+          },
+          "next_pending_invoice_item_invoice": {},
+          "on_behalf_of": {},
+          "pause_collection": {},
+          "payment_settings": {
+            "type": "object",
+            "properties": {
+              "payment_method_options": {},
+              "payment_method_types": {},
+              "save_default_payment_method": {
+                "type": "string",
+                "example": "off"
+              }
+            }
+          },
+          "pending_invoice_item_interval": {},
+          "pending_setup_intent": {},
+          "pending_update": {},
+          "schedule": {},
+          "start_date": {
+            "type": "number",
+            "example": 1679609767
+          },
+          "status": {
+            "type": "string",
+            "example": "active"
+          },
+          "test_clock": {},
+          "transfer_data": {},
+          "trial_end": {},
+          "trial_settings": {
+            "type": "object",
+            "properties": {
+              "end_behavior": {
+                "type": "object",
+                "properties": {
+                  "missing_payment_method": {
+                    "type": "string",
+                    "example": "create_invoice"
+                  }
+                }
+              }
+            }
+          },
+          "trial_start": {}
         }
       }
     }

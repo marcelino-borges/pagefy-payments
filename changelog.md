@@ -16,6 +16,10 @@ This project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## Versions
 
+### [0.17.0] - 2025-03-09
+
+- Feat: endpoint to get user active subscription now returns the features of the correspondent plan
+
 ### [0.16.0] - 2025-03-09
 
 - Feat: new endpoint to get a user subscription through api key (system access)

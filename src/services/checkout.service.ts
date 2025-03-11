@@ -6,6 +6,7 @@ import {
 } from "@/models/stripe/subscription.models";
 import { AppError } from "@/utils/app-error";
 import { HttpStatusCode } from "axios";
+import { getAllPlansFeatures } from "./plans-features.service";
 
 export const getSubsctriptionsByUserId = async (userId: string) => {
   try {
@@ -51,7 +52,22 @@ export const getUserActiveSubscription = async (userId: string) => {
       adaptCheckoutToUserSubscription(checkout)
     );
 
-    return adaptedToUserSubscription[0] as UserSubscription;
+    const subscription = adaptedToUserSubscription[0] as UserSubscription;
+
+    const plansFeatures = await getAllPlansFeatures();
+
+    const planFeatures = plansFeatures.find(
+      (features) => features.stripeProductId === subscription.stripeProductId
+    );
+
+    if (!subscription || !planFeatures) {
+      throw new AppError("Usuário não possui assinatura ativa.", 400);
+    }
+
+    return {
+      subscription,
+      features: planFeatures,
+    };
   } catch (error) {
     throw new AppError("Error finding user active subscription.");
   }
