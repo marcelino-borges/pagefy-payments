@@ -28,6 +28,7 @@ export interface Checkout {
 
 export interface UserSubscription {
   subscriptionId: string;
+  stripeProductId: string;
   isActive: boolean;
   interval: string;
   currency: string;
@@ -36,8 +37,8 @@ export interface UserSubscription {
   captureDate: Date;
   planName: string;
   planImageUrl: string;
-  invoiceOnlineUrl: string;
-  invoiceDownloadPdf: string;
+  invoiceOnlineUrl: string | null;
+  invoiceDownloadPdf: string | null;
   willCancelAt: Date | null;
   canceledAt: Date | null;
   currentPeriodStart: Date;

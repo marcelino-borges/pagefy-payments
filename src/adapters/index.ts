@@ -2,7 +2,7 @@ import { HttpStatusCode } from "axios";
 import { AppErrorsMessages } from "@/constants";
 import { AppError } from "@/utils/app-error";
 import stripe from "@/config/stripe";
-import { Checkout } from "@/models/checkout.models";
+import { Checkout, UserSubscription } from "@/models/checkout.models";
 import { Plan } from "@/models/stripe/plan.models";
 
 export const buildStripeEvent = (requestBody: any, signatureHeader: string) => {
@@ -39,8 +39,11 @@ export const buildStripeEvent = (requestBody: any, signatureHeader: string) => {
   }
 };
 
-export const adaptCheckoutToUserSubscription = (checkout: Checkout) => ({
+export const adaptCheckoutToUserSubscription = (
+  checkout: Checkout
+): UserSubscription => ({
   subscriptionId: checkout.subscription!.id,
+  stripeProductId: checkout.product!.id,
   isActive: checkout.subscription!.status === "active",
   interval: (checkout.subscription!.items.data[0].plan as Plan).interval,
   currency: checkout.session.currency,

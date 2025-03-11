@@ -23,7 +23,7 @@ export const getAllPlans = async () => {
       product.default_price
   );
 
-  const withFilledPrices = [];
+  let withFilledPrices = [];
 
   for (const product of pagefyProducts) {
     const productPrices = await stripe.prices.list({
@@ -86,6 +86,17 @@ export const getAllPlans = async () => {
       ),
     });
   }
+
+  withFilledPrices = withFilledPrices.sort((a: any, b: any) => {
+    const priceA =
+      a.prices.find((p: any) => p.recurring?.interval === "month")
+        ?.unit_amount || 0;
+    const priceB =
+      b.prices.find((p: any) => p.recurring?.interval === "month")
+        ?.unit_amount || 0;
+
+    return priceA - priceB; // Ordena em ordem crescente (menor preço primeiro)
+  });
 
   return withFilledPrices;
 };
