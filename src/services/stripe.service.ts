@@ -9,7 +9,10 @@ import { Session } from "@/models/stripe/session.models";
 import { checkoutModel } from "@/models/checkout.models";
 import log from "@/utils/logs";
 import { buildStripeClientError } from "@/utils";
-import { Subscription } from "@/models/stripe/subscription.models";
+import {
+  Subscription,
+  SubscriptionStatus,
+} from "@/models/stripe/subscription.models";
 import { Plan } from "@/models/stripe/plan.models";
 
 export const getAllPlans = async () => {
@@ -106,6 +109,7 @@ export const createCheckoutSession = async (
   email: string,
   currency: string,
   locale: string,
+  coupon: string,
   userId: string
 ) => {
   const appUrl = process.env.APP_URL;
@@ -113,12 +117,23 @@ export const createCheckoutSession = async (
   if (!stripe || !process.env.APP_URL)
     throw buildStripeClientError("Services.Stripe.createCheckoutSession");
 
+  const price = (await stripe.prices.retrieve(priceId, {
+    expand: ["product"],
+  })) as Omit<Stripe.Price, "product"> & { product: Stripe.Product };
+
   const newSession = await stripe.checkout.sessions.create({
     mode: "subscription",
     ui_mode: "hosted",
     payment_method_types: ["card"],
     customer_email: email,
     currency,
+    discounts: coupon?.length
+      ? [
+          {
+            coupon,
+          },
+        ]
+      : undefined,
     locale: locale as Stripe.Checkout.SessionCreateParams.Locale,
     custom_fields: [
       {
@@ -140,8 +155,8 @@ export const createCheckoutSession = async (
         quantity: 1,
       },
     ],
-    success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl}/checkout/cancel?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: `${appUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}&product_id=${price.product}&product_name=${price.product.name}`,
+    cancel_url: `${appUrl}/checkout/cancel?session_id={CHECKOUT_SESSION_ID}&product_id=${price.product}&product_name=${price.product.name}`,
   });
 
   try {
@@ -324,7 +339,7 @@ export const cancelSubscriptionOnStripe = async (
       "subscription.id": subscriptionId,
     });
 
-    if (!checkout) {
+    if (!checkout?.subscription) {
       throw new AppError(
         "Subscription not found for this user.",
         HttpStatusCode.BadRequest
@@ -332,6 +347,19 @@ export const cancelSubscriptionOnStripe = async (
     }
 
     await stripe.subscriptions.cancel(subscriptionId);
+
+    await checkout.update({
+      subscription: {
+        ...checkout.subscription,
+        canceled_at: new Date().getTime(),
+        cancellation_details: {
+          comment: null,
+          feedback: null,
+          reason: "cancellation_requested",
+        },
+        status: SubscriptionStatus.CANCELED,
+      },
+    });
   } catch (error) {
     throw new AppError(
       "Error canceling subscription.",

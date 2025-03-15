@@ -134,7 +134,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
     return;
   }
 
-  const { priceId, email, currency, locale } = req.body;
+  const { priceId, email, currency, locale, coupon } = req.body;
 
   if (
     !priceId?.length ||
@@ -151,6 +151,7 @@ export const createCheckoutSession = async (req: Request, res: Response) => {
       email,
       currency,
       locale,
+      coupon,
       (req as any).userId
     );
 

@@ -24,7 +24,7 @@ export const getSubsctriptionsByUserId = async (userId: string) => {
         },
       })
       .sort({
-        updatedAt: "asc",
+        updatedAt: "desc",
       });
 
     const adaptedToUserSubscription = checkouts.map((checkout) =>
