@@ -8,7 +8,14 @@ export interface IUser {
   email: string;
   agreePrivacy: boolean;
   receiveCommunications: boolean;
-  plan: PlansTypes;
+  onboardings: {
+    userPages: boolean;
+    pageEditor: {
+      general: boolean;
+      createDialog: boolean;
+      createButton: boolean;
+    };
+  };
 }
 
 export enum PlansTypes {

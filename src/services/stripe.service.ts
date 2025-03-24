@@ -368,3 +368,19 @@ export const cancelSubscriptionOnStripe = async (
     );
   }
 };
+
+export const getCouponById = async (couponId: string) => {
+  if (!stripe) throw buildStripeClientError("Services.Stripe.getCouponDetails");
+
+  try {
+    const coupon = await stripe.coupons.retrieve(couponId);
+
+    return coupon;
+  } catch (error) {
+    throw new AppError(
+      "Error retrieving Stripe coupon.",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
+  }
+};

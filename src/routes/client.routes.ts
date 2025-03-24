@@ -48,6 +48,8 @@ router.get(
   getUserActiveSubscription
 );
 
+router.get("/coupon/:couponId", verifyToken, stripeController.getCouponById);
+
 /*
  * SYSTEM ROUTES (VIA API KEY)
  */

@@ -363,6 +363,57 @@ export const getSubsctriptionById = async (req: Request, res: Response) => {
   }
 };
 
+export const getCouponById = async (req: Request, res: Response) => {
+  /* 
+    #swagger.tags = ['Subscription']
+    #swagger.summary = 'Gets a coupon by ID from Stripe'
+    #swagger.description  = 'Gets a coupon by ID from Stripe'
+    #swagger.parameters['couponId'] = {
+      in: 'params',
+      description: 'Subscription ID',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      description: 'Coupon from Stripe'
+      schema: { $ref: "#/definitions/Coupon" },
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+  const { couponId } = req.params;
+
+  if (!couponId) {
+    res
+      .status(HttpStatusCode.BadRequest)
+      .json(
+        new AppResult(
+          AppErrorsMessages.MISSING_PROPS,
+          null,
+          HttpStatusCode.BadRequest
+        )
+      );
+    return;
+  }
+
+  try {
+    const subscriptionFound = await stripeService.getCouponById(couponId);
+
+    res.status(HttpStatusCode.Ok).send(subscriptionFound);
+  } catch (error) {
+    log.error("[StripeController.getCouponById] EXCEPTION: ", error);
+
+    const result = AppResult.fromError(error);
+    res.status(result.statusCode).json(result);
+  }
+};
+
 export const hookEventsFromStripe = async (req: Request, res: Response) => {
   /* 
     #swagger.tags = ['Webhooks']

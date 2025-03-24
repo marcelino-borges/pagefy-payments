@@ -6,6 +6,7 @@ import {
   checkoutModel,
   invoiceModel,
   subscriptionModel,
+  couponModel,
 } from "./models";
 
 import swaggerAutogen from "swagger-autogen";
@@ -35,6 +36,7 @@ export const runSwaggerAutogen = async (apiVersion: string) => {
       Invoice: invoiceModel,
       Subscription: subscriptionModel,
       Subscriptions: [subscriptionModel],
+      Coupon: couponModel,
     },
   };
 
