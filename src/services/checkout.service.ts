@@ -19,9 +19,6 @@ export const getSubsctriptionsByUserId = async (userId: string) => {
         invoice: {
           $ne: null,
         },
-        charge: {
-          $ne: null,
-        },
       })
       .sort({
         updatedAt: "desc",
