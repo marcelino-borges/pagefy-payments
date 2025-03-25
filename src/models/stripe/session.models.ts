@@ -170,9 +170,9 @@ export const SESSION_SCHEMA = new Schema<Session>(
     success_url: { type: String, required: true },
     total_details: {
       type: {
-        amount_discount: Number,
-        amount_shipping: Number,
-        amount_tax: Number,
+        amount_discount: { type: Number, required: true },
+        amount_shipping: { type: Number, required: true },
+        amount_tax: { type: Number, required: true },
       },
       required: true,
     },

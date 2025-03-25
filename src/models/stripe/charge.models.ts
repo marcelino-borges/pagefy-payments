@@ -141,7 +141,7 @@ export const CHARGE_SCHEMA = new Schema(
     captured: { type: Boolean, required: true },
     created: { type: Number, required: true },
     currency: { type: String, required: true },
-    customer: { type: String, default: null },
+    customer: { type: Schema.Types.Mixed, default: null },
     description: { type: String, default: null },
     destination: { type: String, default: null },
     dispute: { type: String, default: null },
@@ -150,7 +150,7 @@ export const CHARGE_SCHEMA = new Schema(
     failure_code: { type: String, default: null },
     failure_message: { type: String, default: null },
     fraud_details: { type: Map, of: Schema.Types.Mixed },
-    invoice: { type: String, default: null },
+    invoice: { type: Schema.Types.Mixed, default: null },
     livemode: { type: Boolean, required: true },
     metadata: { type: Map, of: Schema.Types.Mixed },
     on_behalf_of: { type: String, default: null },
@@ -167,8 +167,8 @@ export const CHARGE_SCHEMA = new Schema(
       type: { type: String, required: true },
     },
     paid: { type: Boolean, required: true },
-    payment_intent: { type: String, required: true },
-    payment_method: { type: String, required: true },
+    payment_intent: { type: Schema.Types.Mixed, required: true },
+    payment_method: { type: Schema.Types.Mixed, required: true },
     payment_method_details: {
       card: {
         amount_authorized: { type: Number, required: true },

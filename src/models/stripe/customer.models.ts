@@ -1,4 +1,5 @@
 import { Schema } from "mongoose";
+import { Discount } from "./discount.models";
 
 export interface Customer {
   id: string;
@@ -17,7 +18,7 @@ export interface Customer {
   default_source: string | null;
   delinquent: boolean;
   description: string | null;
-  discount: string | null;
+  discount: Discount | null;
   email: string;
   invoice_prefix: string;
   invoice_settings: {
@@ -55,7 +56,7 @@ export const CUSTOMER_SCHEMA = new Schema(
     default_source: { type: String, default: null },
     delinquent: { type: Boolean, required: true },
     description: { type: String, default: null },
-    discount: { type: String, default: null },
+    discount: { type: Schema.Types.Mixed, default: null },
     email: { type: String, required: true },
     invoice_prefix: { type: String, required: true },
     invoice_settings: {

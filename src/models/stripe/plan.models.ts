@@ -40,7 +40,7 @@ export const PLAN_SCHEMA = new Schema(
     metadata: { type: Map, of: Schema.Types.Mixed, default: {} },
     meter: { type: String, default: null },
     nickname: { type: String, default: null },
-    product: { type: String, required: true },
+    product: { type: Schema.Types.Mixed, required: true },
     tiers_mode: { type: String, default: null },
     transform_usage: { type: String, default: null },
     trial_period_days: { type: Number, default: null },

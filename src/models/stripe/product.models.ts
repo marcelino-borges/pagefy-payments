@@ -27,7 +27,7 @@ export const PRODUCT_SCHEMA = new Schema(
     object: { type: String, enum: ["product"], required: true },
     active: { type: Boolean, required: true },
     created: { type: Number, required: true },
-    default_price: { type: String, default: null },
+    default_price: { type: Schema.Types.Mixed, default: null },
     description: { type: String, default: null },
     images: { type: [String], default: [] },
     marketing_features: { type: [String], default: [] },

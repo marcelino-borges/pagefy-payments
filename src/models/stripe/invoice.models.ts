@@ -1,5 +1,9 @@
 import { Schema } from "mongoose";
 import { AutomaticTax } from "./session.models";
+import { Discount } from "./discount.models";
+import { Price } from "./price.models";
+import { Plan } from "./plan.models";
+import { SubscriptionStatus } from "./subscription.models";
 
 interface PaymentSettings {
   default_mandate: string | null;
@@ -29,60 +33,26 @@ interface InvoiceLineItem {
   id: string;
   object: string;
   amount: number;
-  amount_excluding_tax: number;
+  amount_excluding_tax: number | null;
   currency: string;
-  description: string;
+  description: string | null;
   discount_amounts: any[];
   discountable: boolean;
-  discounts: any[];
-  invoice: string;
+  discounts: Discount[] | string[] | null;
+  invoice: string | null;
+  invoice_item: string | null;
   livemode: boolean;
   metadata: Record<string, any>;
   period: { end: number; start: number };
-  plan: {
-    id: string;
-    object: string;
-    active: boolean;
-    amount: number;
-    amount_decimal: string;
-    billing_scheme: string;
-    created: number;
-    currency: string;
-    interval: string;
-    interval_count: number;
-    livemode: boolean;
-    metadata: Record<string, any>;
-    product: string;
-    usage_type: string;
-  };
-  price: {
-    id: string;
-    object: string;
-    active: boolean;
-    billing_scheme: string;
-    created: number;
-    currency: string;
-    lookup_key: string;
-    metadata: Record<string, any>;
-    product: string;
-    recurring: {
-      aggregate_usage: string | null;
-      interval: string;
-      interval_count: number;
-      meter: string | null;
-      trial_period_days: number | null;
-      usage_type: string;
-    };
-    type: string;
-    unit_amount: number;
-    unit_amount_decimal: string;
-  };
-  quantity: number;
-  subscription: string;
-  subscription_item: string;
+  plan: Plan;
+  price: Price | null;
+  quantity: number | null;
+  subscription: SubscriptionStatus | string | null;
+  subscription_item: any | string | null;
   tax_amounts: any[];
   tax_rates: any[];
   type: string;
+  unit_amount_excluding_tax: string | null;
 }
 
 interface InvoiceLines {
@@ -128,8 +98,8 @@ export interface Invoice {
   default_source: string | null;
   default_tax_rates: any[];
   description: string | null;
-  discount: string | null;
-  discounts: any[];
+  discount: Discount | string | null;
+  discounts: string[] | Discount[];
   due_date: number | null;
   effective_at: number | null;
   ending_balance: number;
@@ -200,7 +170,7 @@ export const INVOICE_SCHEMA = new Schema(
     },
     automatically_finalizes_at: { type: Number, default: null },
     billing_reason: { type: String, required: true },
-    charge: { type: String, default: null },
+    charge: { type: Schema.Types.Mixed, default: null },
     collection_method: { type: String, required: true },
     created: { type: Number, required: true },
     currency: { type: String, required: true },
@@ -217,7 +187,7 @@ export const INVOICE_SCHEMA = new Schema(
     default_source: { type: String, default: null },
     default_tax_rates: { type: Array, default: [] },
     description: { type: String, default: null },
-    discount: { type: String, default: null },
+    discount: { type: Schema.Types.Mixed, default: null },
     discounts: { type: Array, default: [] },
     due_date: { type: Number, default: null },
     effective_at: { type: Number, default: null },

@@ -1,6 +1,7 @@
 import { Schema } from "mongoose";
 import { Plan } from "./plan.models";
 import { Price } from "./price.models";
+import { Discount } from "./discount.models";
 
 export enum SubscriptionStatus {
   INCOMPLETE = "incomplete",
@@ -45,8 +46,8 @@ export interface Subscription {
   default_source: string | null;
   default_tax_rates: any[];
   description: string | null;
-  discount: string | null;
-  discounts: any[];
+  discount: Discount | string | null;
+  discounts: Discount[] | string[];
   ended_at: number | null;
   invoice_settings: {
     account_tax_ids: string | null;
@@ -141,12 +142,13 @@ export const SUBSCRIPTION_SCHEMA = new Schema(
     currency: { type: String, required: true },
     current_period_end: { type: Number, required: true },
     current_period_start: { type: Number, required: true },
-    customer: { type: String, required: true },
+    customer: { type: Schema.Types.Mixed, required: true },
     days_until_due: { type: Number, default: null },
     default_payment_method: { type: String, default: null },
     default_source: { type: String, default: null },
     default_tax_rates: { type: Array, default: [] },
     description: { type: String, default: null },
+    discount: { type: Schema.Types.Mixed },
     discounts: { type: Array, default: [] },
     ended_at: { type: Number, default: null },
     invoice_settings: {
@@ -160,7 +162,7 @@ export const SUBSCRIPTION_SCHEMA = new Schema(
       total_count: { type: Number, required: true },
       url: { type: String, required: true },
     },
-    latest_invoice: { type: String, required: true },
+    latest_invoice: { type: Schema.Types.Mixed, required: true },
     livemode: { type: Boolean, required: true },
     metadata: { type: Map, of: Schema.Types.Mixed },
     status: { type: String, required: true },
