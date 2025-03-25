@@ -5,7 +5,7 @@
   "main": "src/server.js",
   "scripts": {
     "start": "env-cmd -f ./.env npx tsx src/server.ts",
-    "start:dev": "env-cmd -f ./.env nodemon -x ts-node src/server.ts",
+    "dev": "env-cmd -f ./.env npx tsx watch src/server.ts",
     "swagger-autogen": "ts-node ./src/config/swagger.ts",
     "update-pkg-version": "ts-node ./src/config/package-json.ts && prettier --write ./package.json",
     "push-main": "git checkout main && git merge develop && git push origin main && git checkout develop",
@@ -48,6 +48,7 @@
     "prettier": "^2.7.1",
     "swagger-autogen": "^2.22.0",
     "tsconfig-paths": "^4.2.0",
+    "tsx": "^4.19.3",
     "typescript": "^5.8.2"
   }
 }

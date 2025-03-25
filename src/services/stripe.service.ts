@@ -18,90 +18,98 @@ import { Plan } from "@/models/stripe/plan.models";
 export const getAllPlans = async () => {
   if (!stripe) throw buildStripeClientError("Services.Stripe.getAllPlans");
 
-  const products = await stripe.products.list({ active: true });
+  try {
+    const products = await stripe.products.list({ active: true });
 
-  const pagefyProducts = products.data.filter(
-    (product) =>
-      product.statement_descriptor?.toLowerCase().includes("pagefy_sub") &&
-      product.default_price
-  );
+    const pagefyProducts = products.data.filter(
+      (product) =>
+        product.statement_descriptor?.toLowerCase().includes("pagefy_sub") &&
+        product.default_price
+    );
 
-  let withFilledPrices = [];
+    let withFilledPrices = [];
 
-  for (const product of pagefyProducts) {
-    const productPrices = await stripe.prices.list({
-      active: true,
-      product: product.id,
+    for (const product of pagefyProducts) {
+      const productPrices = await stripe.prices.list({
+        active: true,
+        product: product.id,
+      });
+
+      const {
+        // removed props
+        package_dimensions,
+        shippable,
+        unit_label,
+        livemode,
+        attributes,
+        object,
+        active,
+        marketing_features,
+        statement_descriptor,
+        tax_code,
+        type,
+        // adapted props
+        name,
+        metadata,
+        updated,
+        created,
+        ...withoutMetadata
+      } = product as any;
+
+      const features = {
+        pt: metadata.features_pt.split(";"),
+        en: metadata.features_en.split(";"),
+      };
+
+      withFilledPrices.push({
+        ...withoutMetadata,
+        features,
+        created_at: new Date(created * 1000),
+        updated_at: new Date(updated * 1000),
+        name: name.replace("Pagefy ", ""),
+        prices: productPrices.data.map(
+          ({
+            // removed props
+            livemode,
+            billing_scheme,
+            object,
+            active,
+            custom_unit_amount,
+            metadata,
+            nickname,
+            tax_behavior,
+            tiers_mode,
+            transform_quantity,
+            // adapted props
+            created,
+            ...price
+          }) => ({
+            ...price,
+            created_at: new Date(created * 1000),
+          })
+        ),
+      });
+    }
+
+    withFilledPrices = withFilledPrices.sort((a: any, b: any) => {
+      const priceA =
+        a.prices.find((p: any) => p.recurring?.interval === "month")
+          ?.unit_amount || 0;
+      const priceB =
+        b.prices.find((p: any) => p.recurring?.interval === "month")
+          ?.unit_amount || 0;
+
+      return priceA - priceB; // Ordena em ordem crescente (menor preço primeiro)
     });
 
-    const {
-      // removed props
-      package_dimensions,
-      shippable,
-      unit_label,
-      livemode,
-      attributes,
-      object,
-      active,
-      marketing_features,
-      statement_descriptor,
-      tax_code,
-      type,
-      // adapted props
-      name,
-      metadata,
-      updated,
-      created,
-      ...withoutMetadata
-    } = product as any;
-
-    const features = {
-      pt: metadata.features_pt.split(";"),
-      en: metadata.features_en.split(";"),
-    };
-
-    withFilledPrices.push({
-      ...withoutMetadata,
-      features,
-      created_at: new Date(created * 1000),
-      updated_at: new Date(updated * 1000),
-      name: name.replace("Pagefy ", ""),
-      prices: productPrices.data.map(
-        ({
-          // removed props
-          livemode,
-          billing_scheme,
-          object,
-          active,
-          custom_unit_amount,
-          metadata,
-          nickname,
-          tax_behavior,
-          tiers_mode,
-          transform_quantity,
-          // adapted props
-          created,
-          ...price
-        }) => ({
-          ...price,
-          created_at: new Date(created * 1000),
-        })
-      ),
-    });
+    return withFilledPrices;
+  } catch (error) {
+    throw new AppError(
+      "Error getting plans",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
   }
-
-  withFilledPrices = withFilledPrices.sort((a: any, b: any) => {
-    const priceA =
-      a.prices.find((p: any) => p.recurring?.interval === "month")
-        ?.unit_amount || 0;
-    const priceB =
-      b.prices.find((p: any) => p.recurring?.interval === "month")
-        ?.unit_amount || 0;
-
-    return priceA - priceB; // Ordena em ordem crescente (menor preço primeiro)
-  });
-
-  return withFilledPrices;
 };
 
 export const createCheckoutSession = async (
@@ -180,85 +188,101 @@ export const getCheckoutSessionById = async (sessionId: string) => {
   if (!stripe)
     throw buildStripeClientError("Services.Stripe.getCheckoutSessionById");
 
-  const session = await stripe.checkout.sessions.retrieve(sessionId);
-  let invoice: Invoice | undefined;
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    let invoice: Invoice | undefined;
 
-  if (session.invoice && typeof session.invoice === "string") {
-    invoice = await getInvoiceById(session.invoice);
+    if (session.invoice && typeof session.invoice === "string") {
+      invoice = await getInvoiceById(session.invoice);
+    }
+
+    return {
+      ...session,
+      invoice: invoice ?? session.invoice,
+    };
+  } catch (error) {
+    throw new AppError(
+      "Error getting checkout session by id",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
   }
-
-  return {
-    ...session,
-    invoice: invoice ?? session.invoice,
-  };
 };
 
 export const getPlanById = async (planId: string) => {
   if (!stripe) throw buildStripeClientError("Services.Stripe.getPlanById");
 
-  const product = await stripe.products.retrieve(planId);
+  try {
+    const product = await stripe.products.retrieve(planId);
 
-  const productPrices = await stripe.prices.list({
-    active: true,
-    product: product.id,
-  });
+    const productPrices = await stripe.prices.list({
+      active: true,
+      product: product.id,
+    });
 
-  const {
-    // removed props
-    package_dimensions,
-    shippable,
-    unit_label,
-    livemode,
-    attributes,
-    object,
-    active,
-    marketing_features,
-    statement_descriptor,
-    tax_code,
-    type,
-    // adapted props
-    name,
-    metadata,
-    updated,
-    created,
-    ...withoutMetadata
-  } = product as any;
+    const {
+      // removed props
+      package_dimensions,
+      shippable,
+      unit_label,
+      livemode,
+      attributes,
+      object,
+      active,
+      marketing_features,
+      statement_descriptor,
+      tax_code,
+      type,
+      // adapted props
+      name,
+      metadata,
+      updated,
+      created,
+      ...withoutMetadata
+    } = product as any;
 
-  const features = {
-    pt: metadata.features_pt.split(";"),
-    en: metadata.features_en.split(";"),
-  };
+    const features = {
+      pt: metadata.features_pt.split(";"),
+      en: metadata.features_en.split(";"),
+    };
 
-  const finalProduct = {
-    ...withoutMetadata,
-    features,
-    created_at: new Date(created * 1000),
-    updated_at: new Date(updated * 1000),
-    name: name.replace("Pagefy ", ""),
-    prices: productPrices.data.map(
-      ({
-        // removed props
-        livemode,
-        billing_scheme,
-        object,
-        active,
-        custom_unit_amount,
-        metadata,
-        nickname,
-        tax_behavior,
-        tiers_mode,
-        transform_quantity,
-        // adapted props
-        created,
-        ...price
-      }) => ({
-        ...price,
-        created_at: new Date(created * 1000),
-      })
-    ),
-  };
+    const finalProduct = {
+      ...withoutMetadata,
+      features,
+      created_at: new Date(created * 1000),
+      updated_at: new Date(updated * 1000),
+      name: name.replace("Pagefy ", ""),
+      prices: productPrices.data.map(
+        ({
+          // removed props
+          livemode,
+          billing_scheme,
+          object,
+          active,
+          custom_unit_amount,
+          metadata,
+          nickname,
+          tax_behavior,
+          tiers_mode,
+          transform_quantity,
+          // adapted props
+          created,
+          ...price
+        }) => ({
+          ...price,
+          created_at: new Date(created * 1000),
+        })
+      ),
+    };
 
-  return finalProduct;
+    return finalProduct;
+  } catch (error) {
+    throw new AppError(
+      "Error getting plan by id.",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
+  }
 };
 
 export const getInvoiceById = async (invoiceId: string) => {
@@ -277,33 +301,49 @@ export const getExpandedCheckoutSessionByIdOnStripe = async (
       "Services.Stripe.getExpandedCheckoutSessionByIdOnStripe"
     );
 
-  const session = await stripe.checkout.sessions.retrieve(sessionId, {
-    expand: [
-      "invoice",
-      "invoice.charge",
-      "subscription",
-      "subscription.items.data.plan",
-      "subscription.items.data.price",
-      "customer",
-    ],
-  });
+  try {
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: [
+        "invoice",
+        "invoice.charge",
+        "subscription",
+        "subscription.items.data.plan",
+        "subscription.items.data.price",
+        "customer",
+      ],
+    });
 
-  const productId = (
-    (session.subscription as Subscription).items.data[0].plan as Plan
-  ).product;
+    const productId = (
+      (session.subscription as Subscription).items.data[0].plan as Plan
+    ).product;
 
-  const product = await stripe.products.retrieve(productId);
+    const product = await stripe.products.retrieve(productId);
 
-  return { ...session, product };
+    return { ...session, product };
+  } catch (error) {
+    throw new AppError(
+      "Error getting expanded checkout session by id.",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
+  }
 };
 
 export const getSubscriptionByIdOnStripe = async (subscriptionId: string) => {
   if (!stripe)
     throw buildStripeClientError("Services.Stripe.getSubscriptionByIdOnStripe");
 
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-  return subscription;
+    return subscription;
+  } catch (error) {
+    throw new AppError(
+      "Error getting subscription by id.",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
+  }
 };
 
 export const getExpandedSubscriptionByIdOnStripe = async (
@@ -314,16 +354,24 @@ export const getExpandedSubscriptionByIdOnStripe = async (
       "Services.Stripe.getExpandedSubscriptionByIdOnStripe"
     );
 
-  const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
-    expand: [
-      "latest_invoice",
-      "items.data.plan",
-      "items.data.price",
-      "customer",
-    ],
-  });
+  try {
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId, {
+      expand: [
+        "latest_invoice",
+        "items.data.plan",
+        "items.data.price",
+        "customer",
+      ],
+    });
 
-  return subscription;
+    return subscription;
+  } catch (error) {
+    throw new AppError(
+      "Error getting expanded subscription by id.",
+      HttpStatusCode.BadRequest,
+      error as Error
+    );
+  }
 };
 
 export const cancelSubscriptionOnStripe = async (

@@ -47,16 +47,16 @@ export const adaptCheckoutToUserSubscription = (
   isActive: checkout.subscription!.status === "active",
   interval: (checkout.subscription!.items.data[0].plan as Plan).interval,
   currency: checkout.session.currency,
-  onlineReceiptUrl: checkout.charge!.receipt_url,
-  price: checkout.charge!.amount_captured,
-  captureDate: new Date(checkout.charge!.created * 100),
+  onlineReceiptUrl: checkout.invoice?.hosted_invoice_url ?? "",
+  price: checkout.invoice?.total ?? 0,
+  captureDate: checkout.charge ? new Date(checkout.charge.created * 100) : null,
   planName: checkout.product!.name,
   planImageUrl: checkout.product!.images[0],
   invoiceOnlineUrl: checkout.invoice!.hosted_invoice_url,
   invoiceDownloadPdf: checkout.invoice!.invoice_pdf,
   willCancelAt: checkout.subscription!.cancel_at
     ? new Date(checkout.subscription!.cancel_at * 1000)
-    : null,
+    : new Date(checkout.subscription!.current_period_end * 1000),
   canceledAt: checkout.subscription!.canceled_at
     ? new Date(checkout.subscription!.canceled_at * 1000)
     : null,

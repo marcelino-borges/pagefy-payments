@@ -33,26 +33,43 @@ export const getSubsctriptionsByUserId = async (userId: string) => {
 
     return adaptedToUserSubscription as UserSubscription[];
   } catch (error) {
-    throw new AppError("Error finding subscriptions.");
+    throw AppError.fromUnknownError(error, 400, "Error finding subscriptions.");
   }
 };
 
 export const getUserActiveSubscription = async (userId: string) => {
   try {
-    const checkouts = await checkoutModel
-      .find({
+    const checkout = await checkoutModel
+      .findOne({
         userId,
-        "subscription.status": SubscriptionStatus.ACTIVE,
+        $and: [
+          {
+            subscription: {
+              $ne: null,
+            },
+          },
+          {
+            "subscription.status": SubscriptionStatus.ACTIVE,
+          },
+          {
+            invoice: {
+              $ne: null,
+            },
+          },
+        ],
       })
       .sort({
         updatedAt: "asc",
-      });
+      })
+      .lean();
 
-    const adaptedToUserSubscription = checkouts.map((checkout) =>
-      adaptCheckoutToUserSubscription(checkout)
-    );
+    if (!checkout) {
+      throw new AppError("No active subscription found for this user", 400);
+    }
 
-    const subscription = adaptedToUserSubscription[0] as UserSubscription;
+    const subscription = adaptCheckoutToUserSubscription(
+      checkout
+    ) as UserSubscription;
 
     const plansFeatures = await getAllPlansFeatures();
 
@@ -60,8 +77,11 @@ export const getUserActiveSubscription = async (userId: string) => {
       (features) => features.stripeProductId === subscription.stripeProductId
     );
 
-    if (!subscription || !planFeatures) {
-      throw new AppError("Usuário não possui assinatura ativa.", 400);
+    if (!planFeatures) {
+      throw new AppError(
+        "No active subscription found with compatible plan features for this user",
+        400
+      );
     }
 
     return {
@@ -69,7 +89,11 @@ export const getUserActiveSubscription = async (userId: string) => {
       features: planFeatures,
     };
   } catch (error) {
-    throw new AppError("Error finding user active subscription.");
+    throw AppError.fromUnknownError(
+      error,
+      400,
+      "Error finding user active subscription."
+    );
   }
 };
 
@@ -93,10 +117,6 @@ export const updateSubscriptionFromWebhook = async (
       throw new AppError("Subscription not found.", HttpStatusCode.BadRequest);
     }
   } catch (error) {
-    throw new AppError(
-      "Error updating subscription.",
-      HttpStatusCode.BadRequest,
-      error as Error
-    );
+    throw AppError.fromUnknownError(error, 400, "Error updating subscription.");
   }
 };

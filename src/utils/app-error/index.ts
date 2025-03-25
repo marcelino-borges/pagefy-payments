@@ -11,4 +11,18 @@ export class AppError extends Error {
 
     log.error(`Error: ${message}. Details: ${originalError}`);
   }
+
+  public static fromUnknownError(
+    error: unknown,
+    statusCode?: number,
+    fallbackMessage?: string
+  ) {
+    if (error instanceof AppError) return error;
+
+    return new AppError(
+      fallbackMessage ?? "Unknown error",
+      statusCode ?? 500,
+      error as Error
+    );
+  }
 }

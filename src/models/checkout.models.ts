@@ -34,7 +34,7 @@ export interface UserSubscription {
   currency: string;
   onlineReceiptUrl: string;
   price: number;
-  captureDate: Date;
+  captureDate: Date | null;
   planName: string;
   planImageUrl: string;
   invoiceOnlineUrl: string | null;

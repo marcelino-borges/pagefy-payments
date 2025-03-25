@@ -9,6 +9,6 @@ export const getAllPlansFeatures = async () => {
 
     return plansFeatures;
   } catch (error) {
-    throw new AppError("Error finding plans features.");
+    throw new AppError("Error finding plans features.", 400, error as Error);
   }
 };
