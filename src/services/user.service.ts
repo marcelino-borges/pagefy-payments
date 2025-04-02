@@ -15,7 +15,7 @@ export const getUserByAuthId = async (authId: string, token: string) => {
     return res.data;
   } catch (error) {
     log.error(
-      "[Services.User.getUserByAuthId] Error finding user by authId: ",
+      `[Services.User.getUserByAuthId] Error finding user by authId ${authId} from ${registrationApi.getUri()}: `,
       error
     );
     return null;
