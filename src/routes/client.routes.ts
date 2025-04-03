@@ -3,6 +3,7 @@ import * as stripeController from "@/controllers/stripe.controller";
 import { verifyToken } from "@/middlewares/auth.middleware";
 import {
   getSubsctriptionsByUserId,
+  getSystemUserActiveSubscription,
   getUserActiveSubscription,
 } from "@/controllers/checkouts.controller";
 import { verifyApiKey } from "@/middlewares/api-key.middleware";
@@ -46,6 +47,12 @@ router.get(
   "/subscription/active/user/:userId",
   verifyToken,
   getUserActiveSubscription
+);
+
+router.get(
+  "/system/subscription/active/user/:userId",
+  verifyApiKey,
+  getSystemUserActiveSubscription
 );
 
 router.get("/coupon/:couponId", verifyToken, stripeController.getCouponById);

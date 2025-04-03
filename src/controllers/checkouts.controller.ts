@@ -132,3 +132,62 @@ export const getUserActiveSubscription = async (
     res.status(result.statusCode).json(result);
   }
 };
+
+export const getSystemUserActiveSubscription = async (
+  req: Request,
+  res: Response
+) => {
+  /* 
+    #swagger.tags = ['Subscription']
+    #swagger.summary = 'Gets user active subscription'
+    #swagger.description  = 'Gets user active subscription'
+    #swagger.parameters['userId'] = {
+      in: 'params',
+      description: 'User ID',
+      required: true,
+      type: 'string'
+    }
+    #swagger.responses[200] = {
+      description: 'Subscriptions',
+      schema: { $ref: "#/definitions/Subscription" },
+    }
+    #swagger.responses[400] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+    #swagger.responses[500] = {
+      schema: { $ref: "#/definitions/Error" },
+      description: 'Message of error'
+    }
+  */
+  const { userId } = req.params;
+
+  if (!userId) {
+    res
+      .status(HttpStatusCode.BadRequest)
+      .json(
+        new AppResult(
+          AppErrorsMessages.MISSING_PROPS,
+          null,
+          HttpStatusCode.BadRequest
+        )
+      );
+    return;
+  }
+
+  try {
+    const subscriptions = await checkoutsService.getUserActiveSubscription(
+      userId
+    );
+
+    res.status(HttpStatusCode.Ok).send(subscriptions);
+  } catch (error) {
+    log.error(
+      "[StripeController.getSystemUserActiveSubscription] EXCEPTION: ",
+      error
+    );
+
+    const result = AppResult.fromError(error);
+    res.status(result.statusCode).json(result);
+  }
+};
